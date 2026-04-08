@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-04-08)
+
 ### Bug Fixes
 
 - fix: repeat heading chain on `---` slides when no level 1 heading exists in the source.
