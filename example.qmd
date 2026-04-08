@@ -1,0 +1,125 @@
+---
+title: |
+  DRY Slides with `---` \
+  Never repeat yourself, let Quarto do it
+subtitle: "Quarto Extension"
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
+format: revealjs
+filters:
+  - cascade
+---
+
+# The Problem
+
+## Too much content, not enough slides
+
+When a topic spans multiple slides, you end up writing the same heading over and over:
+
+```markdown
+## My Long Topic
+
+First part of the content...
+
+## My Long Topic
+
+Second part of the content...
+
+## My Long Topic
+
+Third part of the content...
+```
+
+This violates the **DRY** principle and makes refactoring painful.
+
+# The Solution
+
+## The `cascade` extension
+
+A filter that repeats the heading chain **automatically** when you use `---` to create a new slide.
+
+```markdown
+## My Long Topic
+
+First part of the content...
+
+---
+
+Second part, heading repeated for you!
+```
+
+- Works only for `revealjs` output (configurable for other formats).
+- Repeats the full heading hierarchy, not just the immediate title.
+
+---
+
+This very slide was created with `---`.
+
+No heading was written in the source; it was repeated from the previous slide.
+
+## Nested headings work too
+
+### Deep dive
+
+Content under a nested heading structure.
+
+---
+
+### Still diving
+
+Both `## Nested headings work too` and `### Still diving` were inserted by the filter.
+Only parent headings above this `###` level are repeated.
+
+# Before and After
+
+## Before: repetitive markdown
+
+```markdown
+## Results
+
+### Experiment A
+
+Observations for experiment A...
+
+---
+
+## Results
+
+### Experiment A
+
+More observations for experiment A...
+
+---
+
+## Results
+
+### Experiment B
+
+Observations for experiment B...
+```
+
+---
+
+## After: DRY markdown
+
+```markdown
+## Results
+
+### Experiment A
+
+Observations for experiment A...
+
+---
+
+More observations for experiment A...
+
+---
+
+### Experiment B
+
+Observations for experiment B...
+```
+
+Fewer lines, single source of truth for headings, and zero risk of typos.
