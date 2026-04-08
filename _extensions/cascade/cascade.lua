@@ -89,13 +89,30 @@ function Pandoc(doc)
   end
 
   local slide_level = detect_slide_level(doc.blocks)
+  local parents = {}
   local chain = {}
   local at_slide_start = false
   local new_blocks = pandoc.Blocks({})
 
   for i, block in ipairs(doc.blocks) do
-    if block.t == 'Header' and block.level == slide_level then
-      chain = { block }
+    if block.t == 'Header' and block.level < slide_level then
+      local new_parents = {}
+      for _, p in ipairs(parents) do
+        if p.level < block.level then
+          table.insert(new_parents, p)
+        end
+      end
+      table.insert(new_parents, block)
+      parents = new_parents
+      chain = {}
+      at_slide_start = false
+      new_blocks:insert(block)
+    elseif block.t == 'Header' and block.level == slide_level then
+      chain = {}
+      for _, p in ipairs(parents) do
+        table.insert(chain, p)
+      end
+      table.insert(chain, block)
       at_slide_start = true
       new_blocks:insert(block)
     elseif at_slide_start and block.t == 'Header' then

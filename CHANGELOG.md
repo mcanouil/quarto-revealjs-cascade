@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: repeat heading chain on `---` slides when no level 1 heading exists in the source.
+
 ## 0.1.1 (2026-04-08)
 
 ### Chores
