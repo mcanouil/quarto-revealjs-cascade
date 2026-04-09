@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 (2026-04-09)
+
 ### Bug Fixes
 
 - fix: exclude section-level headings (topmost heading level) from cascade repetition on `---` slides.
