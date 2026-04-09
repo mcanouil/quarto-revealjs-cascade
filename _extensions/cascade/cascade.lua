@@ -20,8 +20,8 @@
 ---   (default: `true`).
 ---   When `false`, horizontal rules are removed from the output.
 ---
----   Accounts for `shift-heading-level-by` by detecting the actual slide-level
----   heading in the pre-shift AST.
+---   Accounts for `shift-heading-level-by` by detecting the topmost heading
+---   level (section creator) and excluding it from repetition.
 
 --- Read the `keep-hrule` extension option from document metadata.
 --- @param meta pandoc.Meta The document metadata.
@@ -42,11 +42,14 @@ local function get_keep_hrule(meta)
   return pandoc.utils.stringify(keep) ~= 'false'
 end
 
---- Detect the pre-shift heading level that corresponds to the slide level.
---- With `shift-heading-level-by`, Pandoc shifts heading levels AFTER filters,
---- so the AST still has the original (pre-shift) levels.
+--- Detect the effective slide level and the topmost heading level.
+--- The topmost heading level (section creator) is excluded from repetition
+--- to avoid creating new sections when repeating headings on `---` slides.
+--- This works correctly with `shift-heading-level-by` because Quarto caps
+--- the shift so that the minimum heading level always maps to output level 1.
 --- @param blocks pandoc.Blocks The document blocks.
---- @return integer The detected slide level.
+--- @return integer slide_level The detected slide level.
+--- @return integer|nil section_level The topmost heading level, or nil.
 local function detect_slide_level(blocks)
   local slide_level = 2
   if PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.slide_level then
@@ -61,12 +64,12 @@ local function detect_slide_level(blocks)
     end
   end
   if not min_level then
-    return slide_level
+    return slide_level, nil
   end
   if min_level >= slide_level then
-    return min_level + 1
+    return min_level + 1, min_level
   end
-  return slide_level
+  return slide_level, min_level
 end
 
 --- Process the full document: detect the effective slide level, then
@@ -88,7 +91,7 @@ function Pandoc(doc)
     return doc
   end
 
-  local slide_level = detect_slide_level(doc.blocks)
+  local slide_level, section_level = detect_slide_level(doc.blocks)
   local parents = {}
   local chain = {}
   local at_slide_start = false
@@ -123,7 +126,7 @@ function Pandoc(doc)
       local next_is_header = next_block and next_block.t == 'Header'
       local new_chain = {}
       for _, h in ipairs(chain) do
-        if not next_is_header or h.level < next_block.level then
+        if (not section_level or h.level > section_level) and (not next_is_header or h.level < next_block.level) then
           local clone = h:clone()
           clone.identifier = ''
           new_blocks:insert(clone)
