@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: exclude section-level headings (topmost heading level) from cascade repetition on `---` slides.
+  Works correctly with `shift-heading-level-by`.
+
 ## 0.2.0 (2026-04-08)
 
 ### Bug Fixes
