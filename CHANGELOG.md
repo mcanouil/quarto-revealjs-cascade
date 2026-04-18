@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.1 (2026-04-18)
+
 ### Bug Fixes
 
 - fix: cascade heading chain on `---` slides when the source has no level 1 heading (e.g. starts at `## h2`).
