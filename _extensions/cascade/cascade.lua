@@ -3,7 +3,6 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @version 0.0.0
 --- @description Repeat top-level headings on slides created with horizontal
 ---   rules (`---`).
 ---   In reveal.js presentations, a `---` separator creates a new slide without
