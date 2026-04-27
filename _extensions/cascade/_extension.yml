@@ -1,6 +1,6 @@
 title: Reveal.js Cascade
 author: Mickaël Canouil
-version: 0.3.1
+version: 0.3.2
 quarto-required: ">=1.9.36"
 contributes:
   filters:

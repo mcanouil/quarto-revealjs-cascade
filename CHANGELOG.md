@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.2 (2026-04-27)
+
 ### Bug Fixes
 
 - fix: cascade chain on `---` slides when `shift-heading-level-by` is set under a format-scoped option (e.g. `format.revealjs.shift-heading-level-by`).
