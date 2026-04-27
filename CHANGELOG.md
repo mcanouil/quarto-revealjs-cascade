@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: cascade chain on `---` slides when `shift-heading-level-by` is set under a format-scoped option (e.g. `format.revealjs.shift-heading-level-by`).
+  Quarto strips format-scoped options from `doc.meta` before user filters run, so the 0.3.1 fix silently fell back to `shift = 0` and incorrectly cloned section-level headings on `---` slides.
+  Slide level detection now combines the metadata path with an AST scan that escalates the slide level when the source structure indicates a deeper effective level.
+
 ## 0.3.1 (2026-04-18)
 
 ### Bug Fixes
