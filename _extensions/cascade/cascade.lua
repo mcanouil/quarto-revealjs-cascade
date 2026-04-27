@@ -22,7 +22,11 @@
 ---   Headings below the slide level create section wrappers in reveal.js
 ---   output, so they are skipped when cloning the chain on `---` slides.
 ---   Accounts for `shift-heading-level-by` (applied after filters run) by
----   translating the writer's slide level back into AST coordinates.
+---   combining the metadata value with an AST scan: the metadata shift is
+---   authoritative when present, and the AST scan recovers the correct
+---   slide level when shift is set under a format-scoped option (e.g.
+---   `format.revealjs.shift-heading-level-by`) that Quarto strips from
+---   `doc.meta` before user filters run.
 
 --- Read the `keep-hrule` extension option from document metadata.
 --- @param meta pandoc.Meta The document metadata.
@@ -45,23 +49,44 @@ end
 
 --- Detect the effective slide level in AST coordinates.
 --- `PANDOC_WRITER_OPTIONS.slide_level` is the writer's (post-shift) slide
---- level. Pandoc/Quarto applies `shift-heading-level-by` after filters run,
---- so the AST still has pre-shift heading levels; subtract the shift to get
---- the slide level as it appears in the AST.
+--- level. The AST still has pre-shift heading levels, so the AST slide
+--- level is `slide_level - shift`.
+--- The shift is read from metadata when available; otherwise, the AST is
+--- scanned for the smallest heading level whose `Header` is directly
+--- followed by non-`Header` content (mirrors pandoc's auto slide-level
+--- algorithm) and used to escalate the slide level when it indicates a
+--- deeper effective level than the metadata path.
+--- @param blocks pandoc.Blocks The document blocks.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer The slide level in AST coordinates.
-local function detect_slide_level(meta)
+local function detect_slide_level(blocks, meta)
   local slide_level = 2
   if PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.slide_level then
     slide_level = PANDOC_WRITER_OPTIONS.slide_level
   end
-  local shift = meta['shift-heading-level-by']
-  if shift then
-    shift = tonumber(pandoc.utils.stringify(shift)) or 0
-  else
-    shift = 0
+  local shift_meta = meta['shift-heading-level-by']
+  local shift = 0
+  if shift_meta then
+    shift = tonumber(pandoc.utils.stringify(shift_meta)) or 0
   end
-  return slide_level - shift
+  local ast_slide_level = slide_level - shift
+  if shift == 0 then
+    local from_ast = nil
+    for i, block in ipairs(blocks) do
+      if block.t == 'Header' then
+        local next_block = blocks[i + 1]
+        if next_block and next_block.t ~= 'Header' then
+          if not from_ast or block.level < from_ast then
+            from_ast = block.level
+          end
+        end
+      end
+    end
+    if from_ast and from_ast > ast_slide_level then
+      ast_slide_level = from_ast
+    end
+  end
+  return ast_slide_level
 end
 
 --- Process the full document: detect the effective slide level, then
@@ -83,7 +108,7 @@ function Pandoc(doc)
     return doc
   end
 
-  local slide_level = detect_slide_level(doc.meta)
+  local slide_level = detect_slide_level(doc.blocks, doc.meta)
   local parents = {}
   local chain = {}
   local at_slide_start = false
