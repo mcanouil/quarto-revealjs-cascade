@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: split slides on `---` nested inside a Div (reveal.js only).
+  The enclosing Div is closed, the heading chain is repeated, and an identical Div is reopened around the content that follows.
+  Works for every Div except `.panel-tabset` and cross-reference targets (a Div whose identifier looks like `tbl-…`, `fig-…`, `thm-…`, …). The filter now runs at the `pre-ast` entry point.
+
 ## 0.3.2 (2026-04-27)
 
 ### Bug Fixes

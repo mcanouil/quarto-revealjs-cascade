@@ -4,4 +4,5 @@ version: 0.3.2
 quarto-required: ">=1.9.36"
 contributes:
   filters:
-    - cascade.lua
+    - path: cascade.lua
+      at: pre-ast
