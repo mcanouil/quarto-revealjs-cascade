@@ -166,17 +166,16 @@ end
 --- from the most recent slide.
 --- For non-reveal.js formats, either keep or remove horizontal rules
 --- based on the `keep-hrule` option.
---- @param doc pandoc.Pandoc The document to process.
---- @return pandoc.Pandoc The processed document.
+--- Parameter and return types are provided by the Quarto Lua plugin.
 function Pandoc(doc)
   if not quarto.doc.is_format('revealjs') then
     local keep_hrule = get_keep_hrule(doc.meta)
     if keep_hrule then
       return doc
     end
-    doc.blocks = doc.blocks:filter(function(block)
+    doc.blocks = pandoc.Blocks(doc.blocks:filter(function(block)
       return block.t ~= 'HorizontalRule'
-    end)
+    end))
     return doc
   end
 
