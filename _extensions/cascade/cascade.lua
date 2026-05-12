@@ -129,8 +129,7 @@ end
 --- duplicate IDs. Only applies to reveal.js output; `.panel-tabset` Divs and
 --- cross-reference targets (identifier of the form `<type>-<label>`, e.g.
 --- `tbl-results`, `fig-plot`, `thm-main`) are left untouched.
---- @param div pandoc.Div The Div to process.
---- @return pandoc.Blocks|nil The replacement blocks, or `nil` to keep the Div.
+--- Parameter and return types are provided by the Quarto Lua plugin.
 function Div(div)
   if not quarto.doc.is_format('revealjs') then
     return nil
