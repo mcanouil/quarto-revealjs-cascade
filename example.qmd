@@ -74,6 +74,82 @@ Content under a nested heading structure.
 Both `## Nested headings work too` and `### Still diving` on the slide.
 Only parent headings above this `###` level are repeated from the previous slide.
 
+# Inside Blocks
+
+## Callouts split too
+
+```markdown
+::: {.callout-tip title="A multi-part tip"}
+
+First half of the tip.
+
+---
+
+Second half: the heading **and** the callout were repeated automatically.
+
+:::
+```
+
+::: {.callout-tip title="A multi-part tip"}
+
+First half of the tip.
+
+---
+
+Second half: the heading **and** the callout were repeated automatically.
+
+:::
+
+## Regular divs split too
+
+```markdown
+::: {.column-margin}
+
+A side note, first part.
+
+---
+
+Second part, still in the margin, on a new slide.
+
+:::
+```
+
+::: {.column-margin}
+
+A side note, first part.
+
+---
+
+Second part, still in the margin, on a new slide.
+
+:::
+
+## Cross-reference does not break
+
+### (_i.e._, `^%a+%-` ID)
+
+```markdown
+::: {#tip-one .callout-tip title="A multi-part tip"}
+
+First half of the tip.
+
+---
+
+Second half: the heading **and** the callout were repeated automatically.
+
+:::
+```
+
+::: {#tip-one .callout-tip title="A multi-part tip"}
+
+First half of the tip.
+
+---
+
+Second half: the heading **and** the callout were repeated automatically.
+
+:::
+
 # Before and After
 
 ## Before: repetitive markdown

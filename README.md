@@ -42,6 +42,27 @@ More observations (headings repeated automatically).
 Observations for experiment B (only parent headings repeated).
 ```
 
+### Inside Divs
+
+A `---` nested inside a Div splits the slide there too: the enclosing Div is closed, the heading chain is repeated, and an identical Div is reopened around the content that follows.
+This works for every Div except `.panel-tabset` and cross-reference targets (a Div whose identifier looks like `#tbl-…`, `#fig-…`, `#thm-…`, ...).
+
+```markdown
+## Results
+
+::: {.column-margin}
+
+A side note, first part.
+
+---
+
+Second part, still in the margin, on a new slide.
+
+:::
+```
+
+This produces two `## Results` slides, each with the same `.column-margin` Div wrapping one paragraph.
+
 ### Non-reveal.js Formats
 
 By default, `---` is removed from non-reveal.js output.

@@ -15,9 +15,21 @@
 ---   When followed by non-heading content, the entire heading chain is
 ---   repeated.
 ---
+---   A `---` nested inside a Div is hoisted to the slide level: the
+---   enclosing Div is closed, the heading chain is repeated, and an
+---   identical Div is reopened around the content that follows. This works
+---   for every Div except `.panel-tabset` and cross-reference targets
+---   (a Div whose identifier looks like `tbl-…`, `fig-…`, `thm-…`, …),
+---   and for reveal.js output only.
+---   The full heading chain is always repeated in this case; the
+---   heading-after-`---` shortening only applies at the top level.
+---
 ---   For non-reveal.js formats, behaviour depends on the `keep-hrule` option
 ---   (default: `true`).
 ---   When `false`, horizontal rules are removed from the output.
+---
+---   The filter runs at the `pre-ast` entry point, before Quarto normalises
+---   the AST, so every Div is still a plain Div when the filter sees it.
 ---
 ---   Headings below the slide level create section wrappers in reveal.js
 ---   output, so they are skipped when cloning the chain on `---` slides.
@@ -25,8 +37,8 @@
 ---   combining the metadata value with an AST scan: the metadata shift is
 ---   authoritative when present, and the AST scan recovers the correct
 ---   slide level when shift is set under a format-scoped option (e.g.
----   `format.revealjs.shift-heading-level-by`) that Quarto strips from
----   `doc.meta` before user filters run.
+---   `format.revealjs.shift-heading-level-by`) that is not yet flattened
+---   onto `doc.meta` when the filter runs.
 
 --- Read the `keep-hrule` extension option from document metadata.
 --- @param meta pandoc.Meta The document metadata.
@@ -87,6 +99,66 @@ local function detect_slide_level(blocks, meta)
     end
   end
   return ast_slide_level
+end
+
+--- Split a list of blocks into pieces wherever a `HorizontalRule` occurs.
+--- @param blocks pandoc.List The blocks to split.
+--- @return table A list of block lists (one more than the number of rules).
+--- @return boolean Whether at least one `HorizontalRule` was found.
+local function split_blocks_at_horizontal_rule(blocks)
+  local pieces = {}
+  local current = {}
+  local found = false
+  for _, block in ipairs(blocks) do
+    if block.t == 'HorizontalRule' then
+      found = true
+      table.insert(pieces, current)
+      current = {}
+    else
+      table.insert(current, block)
+    end
+  end
+  table.insert(pieces, current)
+  return pieces, found
+end
+
+--- Hoist `---` out of a Div: when the Div directly contains one or more
+--- `HorizontalRule`s, replace it with a sequence of clones of the Div, one
+--- per non-empty fragment, separated by `HorizontalRule`s at the slide
+--- level. The identifier is cleared on every clone after the first to avoid
+--- duplicate IDs. Only applies to reveal.js output; `.panel-tabset` Divs and
+--- cross-reference targets (identifier of the form `<type>-<label>`, e.g.
+--- `tbl-results`, `fig-plot`, `thm-main`) are left untouched.
+--- Parameter and return types are provided by the Quarto Lua plugin.
+function Div(div)
+  if not quarto.doc.is_format('revealjs') then
+    return nil
+  end
+  if div.classes:includes('panel-tabset') then
+    return nil
+  end
+  if div.identifier ~= '' and div.identifier:match('^%a+%-') then
+    return nil
+  end
+  local pieces, found = split_blocks_at_horizontal_rule(div.content)
+  if not found then
+    return nil
+  end
+  local blocks = pandoc.Blocks({})
+  for index, piece in ipairs(pieces) do
+    local not_first = index > 1
+    if not_first then
+      blocks:insert(pandoc.HorizontalRule())
+    end
+    if #piece > 0 then
+      local attr = div.attr:clone()
+      if not_first then
+        attr.identifier = ''
+      end
+      blocks:insert(pandoc.Div(pandoc.Blocks(piece), attr))
+    end
+  end
+  return blocks
 end
 
 --- Process the full document: detect the effective slide level, then
