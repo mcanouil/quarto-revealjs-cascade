@@ -144,20 +144,21 @@ function Div(div)
   if not found then
     return nil
   end
-  local blocks = {}
+  local blocks = pandoc.Blocks({})
   for index, piece in ipairs(pieces) do
-    if index > 1 then
-      table.insert(blocks, pandoc.HorizontalRule())
+    local not_first = index > 1
+    if not_first then
+      blocks:insert(pandoc.HorizontalRule())
     end
     if #piece > 0 then
       local attr = div.attr:clone()
-      if index > 1 then
+      if not_first then
         attr.identifier = ''
       end
-      table.insert(blocks, pandoc.Div(pandoc.Blocks(piece), attr))
+      blocks:insert(pandoc.Div(pandoc.Blocks(piece), attr))
     end
   end
-  return pandoc.Blocks(blocks)
+  return blocks
 end
 
 --- Process the full document: detect the effective slide level, then
