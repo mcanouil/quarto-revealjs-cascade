@@ -90,6 +90,8 @@ Second half: the heading **and** the callout were repeated automatically.
 :::
 ```
 
+---
+
 ::: {.callout-tip title="A multi-part tip"}
 
 First half of the tip.
@@ -113,6 +115,8 @@ Second part, still in the margin, on a new slide.
 
 :::
 ```
+
+---
 
 ::: {.column-margin}
 
