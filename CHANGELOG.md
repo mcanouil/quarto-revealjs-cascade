@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: strip `---` nested inside Divs when `keep-hrule: false` for non-reveal.js formats.
+  Previously only top-level horizontal rules were removed, so rules inside callouts, `column-margin`, and other Divs leaked into the output.
+
 ## 0.4.0 (2026-05-14)
 
 ### New Features
