@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.1 (2026-05-14)
+
 ### Bug Fixes
 
 - fix: strip `---` nested inside Divs when `keep-hrule: false` for non-reveal.js formats.
