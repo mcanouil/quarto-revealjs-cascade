@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 (2026-05-14)
+
 ### New Features
 
 - feat: split slides on `---` nested inside a Div (reveal.js only).
