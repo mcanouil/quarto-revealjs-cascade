@@ -173,9 +173,9 @@ function Pandoc(doc)
     if keep_hrule then
       return doc
     end
-    doc.blocks = pandoc.Blocks(doc.blocks:filter(function(block)
-      return block.t ~= 'HorizontalRule'
-    end))
+    doc.blocks = doc.blocks:walk({
+      HorizontalRule = function() return {} end,
+    })
     return doc
   end
 
