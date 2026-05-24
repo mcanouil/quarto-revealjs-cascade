@@ -9,5 +9,5 @@ authors:
 repository-code: "https://github.com/mcanouil/quarto-revealjs-cascade"
 url: "https://m.canouil.dev/quarto-revealjs-cascade/"
 license: "MIT"
-date-released: "2026-05-14"
-version: 0.4.1
+date-released: "2026-05-24"
+version: 0.5.0

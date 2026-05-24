@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-05-24)
+
 ### New Features
 
 - feat: add the `.no-cascade` heading class to opt a heading out of cascade repetition.
