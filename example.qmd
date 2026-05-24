@@ -12,6 +12,9 @@ format:
     output-file: index
 filters:
   - cascade
+extensions:
+  cascade:
+    depth: 2
 ---
 
 # The Problem
@@ -73,6 +76,34 @@ Content under a nested heading structure.
 
 Both `## Nested headings work too` and `### Still diving` on the slide.
 Only parent headings above this `###` level are repeated from the previous slide.
+
+# Fine Tuning
+
+## Opting out with `{.no-cascade}`
+
+### A pinned subheading {.no-cascade}
+
+A heading marked `{.no-cascade}` stays here but is never repeated.
+
+---
+
+Only `## Opting out with {.no-cascade}` is repeated.
+The `### A pinned subheading` is not, because of the `{.no-cascade}` class.
+
+## Limiting the depth
+
+### Level three heading
+
+This presentation sets `depth: 2`, so only the top two heading levels cascade.
+
+#### Level four heading
+
+This level-four heading is below the depth limit.
+
+---
+
+Both `## Limiting the depth` and `### Level three heading` are repeated.
+The `#### Level four heading` is dropped because it sits beyond `depth: 2`.
 
 # Inside Blocks
 

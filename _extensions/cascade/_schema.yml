@@ -7,3 +7,9 @@ options:
     description: >
       Whether to keep horizontal rules (`---`) in non-reveal.js formats.
       When `false`, horizontal rules are removed from the output.
+  depth:
+    type: number
+    description: >
+      Maximum number of heading levels of the chain to repeat on continuation
+      slides, counted from the slide level. When unset, the full chain is
+      repeated.
