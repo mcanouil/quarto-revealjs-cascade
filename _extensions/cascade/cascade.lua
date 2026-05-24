@@ -31,6 +31,15 @@
 ---   The filter runs at the `pre-ast` entry point, before Quarto normalises
 ---   the AST, so every Div is still a plain Div when the filter sees it.
 ---
+---   A heading carrying the `no-cascade` class is never repeated on
+---   continuation slides and is not carried in the parent chain for
+---   subsequent `---` slides.
+---
+---   The `extensions.cascade.depth` option limits how many heading levels of
+---   the chain are repeated on continuation slides (default: no limit).
+---   When set to `N`, only the top `N` levels relative to the slide level are
+---   cloned.
+---
 ---   Headings below the slide level create section wrappers in reveal.js
 ---   output, so they are skipped when cloning the chain on `---` slides.
 ---   Accounts for `shift-heading-level-by` (applied after filters run) by
@@ -57,6 +66,26 @@ local function get_keep_hrule(meta)
     return false
   end
   return pandoc.utils.stringify(keep) ~= 'false'
+end
+
+--- Read the `depth` extension option from document metadata.
+--- @param meta pandoc.Meta The document metadata.
+--- @return integer|nil The maximum number of heading levels to repeat, or
+---   `nil` when no limit is set.
+local function get_depth(meta)
+  local extensions = meta['extensions']
+  if not extensions then
+    return nil
+  end
+  local cascade = extensions['cascade']
+  if not cascade then
+    return nil
+  end
+  local depth = cascade['depth']
+  if depth == nil then
+    return nil
+  end
+  return tonumber(pandoc.utils.stringify(depth))
 end
 
 --- Detect the effective slide level in AST coordinates.
@@ -164,6 +193,8 @@ end
 --- Process the full document: detect the effective slide level, then
 --- replace each `HorizontalRule` with clones of the heading chain
 --- from the most recent slide.
+--- Headings marked `.no-cascade` are excluded from the chain, and the
+--- `depth` option limits how many heading levels of the chain are repeated.
 --- For non-reveal.js formats, either keep or remove horizontal rules
 --- based on the `keep-hrule` option.
 --- Parameter and return types are provided by the Quarto Lua plugin.
@@ -180,6 +211,7 @@ function Pandoc(doc)
   end
 
   local slide_level = detect_slide_level(doc.blocks, doc.meta)
+  local depth = get_depth(doc.meta)
   local parents = {}
   local chain = {}
   local at_slide_start = false
@@ -193,7 +225,9 @@ function Pandoc(doc)
           table.insert(new_parents, p)
         end
       end
-      table.insert(new_parents, block)
+      if not block.classes:includes('no-cascade') then
+        table.insert(new_parents, block)
+      end
       parents = new_parents
       chain = {}
       at_slide_start = false
@@ -203,18 +237,23 @@ function Pandoc(doc)
       for _, p in ipairs(parents) do
         table.insert(chain, p)
       end
-      table.insert(chain, block)
+      if not block.classes:includes('no-cascade') then
+        table.insert(chain, block)
+      end
       at_slide_start = true
       new_blocks:insert(block)
     elseif at_slide_start and block.t == 'Header' then
-      table.insert(chain, block)
+      if not block.classes:includes('no-cascade') then
+        table.insert(chain, block)
+      end
       new_blocks:insert(block)
     elseif block.t == 'HorizontalRule' and #chain > 0 then
       local next_block = doc.blocks[i + 1]
       local next_is_header = next_block and next_block.t == 'Header'
       local new_chain = {}
       for _, h in ipairs(chain) do
-        if h.level >= slide_level and (not next_is_header or h.level < next_block.level) then
+        local within_depth = not depth or (h.level - slide_level) < depth
+        if within_depth and h.level >= slide_level and (not next_is_header or h.level < next_block.level) then
           local clone = h:clone()
           clone.identifier = ''
           new_blocks:insert(clone)

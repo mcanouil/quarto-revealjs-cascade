@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: add the `.no-cascade` heading class to opt a heading out of cascade repetition.
+  A heading marked `.no-cascade` stays on its own slide but is never repeated on continuation slides nor carried in the parent chain for subsequent `---` slides.
+- feat: add the `extensions.cascade.depth` option to limit how many heading levels of the chain are repeated on continuation slides.
+  When set to `N`, only the top `N` levels relative to the slide level are repeated; when unset, the full chain is repeated.
+
 ## 0.4.1 (2026-05-14)
 
 ### Bug Fixes
