@@ -108,10 +108,10 @@ extensions:
 
 Set options under `extensions.cascade` in the document or project YAML.
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `keep-hrule` | boolean | `false` | Whether to keep horizontal rules (`---`) in non-reveal.js formats. |
-| `depth` | number | unset | Maximum number of heading levels of the chain to repeat on continuation slides, counted from the slide level. When unset, the full chain is repeated. |
+| Option       | Type    | Default | Description                                                                                                                                           |
+| ------------ | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `keep-hrule` | boolean | `false` | Whether to keep horizontal rules (`---`) in non-reveal.js formats.                                                                                    |
+| `depth`      | number  | unset   | Maximum number of heading levels of the chain to repeat on continuation slides, counted from the slide level. When unset, the full chain is repeated. |
 
 The `.no-cascade` class is set per heading rather than through these options.
 
