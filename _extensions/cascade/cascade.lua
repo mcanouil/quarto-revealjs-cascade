@@ -101,7 +101,7 @@ local function get_depth(meta)
   return tonumber(pandoc.utils.stringify(depth))
 end
 
---- Parse a per-heading `cascade-depth` attribute as a positive integer.
+--- Parse a per-heading `cascade-depth` attribute as a non-negative integer.
 --- Returns `nil` when the attribute is absent. Emits a warning and returns
 --- `nil` when the value is not a non-negative integer.
 --- @param header pandoc.Header The heading.
@@ -320,7 +320,6 @@ function Pandoc(doc)
       local next_block = doc.blocks[i + 1]
       local next_is_header = next_block and next_block.t == 'Header'
       local new_chain = {}
-      local cloned = {}
       for _, h in ipairs(chain) do
         local within_depth = not active_depth or (h.level - slide_level) < active_depth
         if within_depth and h.level >= slide_level and (not next_is_header or h.level < next_block.level) then
@@ -328,10 +327,9 @@ function Pandoc(doc)
           clone.identifier = ''
           new_blocks:insert(clone)
           table.insert(new_chain, clone)
-          table.insert(cloned, clone)
         end
       end
-      warn_non_contiguous_chain(cloned)
+      warn_non_contiguous_chain(new_chain)
       chain = new_chain
       at_slide_start = true
     else
