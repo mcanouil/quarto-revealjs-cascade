@@ -12,4 +12,5 @@ options:
     description: >
       Maximum number of heading levels of the chain to repeat on continuation
       slides, counted from the slide level. When unset, the full chain is
-      repeated.
+      repeated. The `cascade-depth` heading attribute overrides this value
+      for the chain starting at that heading.

@@ -39,6 +39,13 @@
 ---   the chain are repeated on continuation slides (default: no limit).
 ---   When set to `N`, only the top `N` levels relative to the slide level are
 ---   cloned.
+---   The `cascade-depth` heading attribute overrides the document-level
+---   `depth` for the chain that starts at that heading.
+---
+---   When the cloned chain skips a heading level (for example, a `##`
+---   followed by a `####` with no `###` in between), the filter emits a
+---   warning. The output is still produced; the warning surfaces a source
+---   structure that is likely accidental.
 ---
 ---   Headings below the slide level create section wrappers in reveal.js
 ---   output, so they are skipped when cloning the chain on `---` slides.
@@ -48,6 +55,12 @@
 ---   slide level when shift is set under a format-scoped option (e.g.
 ---   `format.revealjs.shift-heading-level-by`) that is not yet flattened
 ---   onto `doc.meta` when the filter runs.
+
+local EXTENSION_NAME = 'cascade'
+local DEPTH_ATTRIBUTE = 'cascade-depth'
+
+--- Load the shared logging module bundled with this extension.
+local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
 
 --- Read the `keep-hrule` extension option from document metadata.
 --- @param meta pandoc.Meta The document metadata.
@@ -86,6 +99,30 @@ local function get_depth(meta)
     return nil
   end
   return tonumber(pandoc.utils.stringify(depth))
+end
+
+--- Parse a per-heading `cascade-depth` attribute as a positive integer.
+--- Returns `nil` when the attribute is absent. Emits a warning and returns
+--- `nil` when the value is not a non-negative integer.
+--- @param header pandoc.Header The heading.
+--- @return integer|nil The parsed depth, or `nil` to fall back to the
+---   document-level setting.
+local function read_heading_depth(header)
+  local raw = header.attributes[DEPTH_ATTRIBUTE]
+  if raw == nil then
+    return nil
+  end
+  header.attributes[DEPTH_ATTRIBUTE] = nil
+  local parsed = tonumber(raw)
+  if parsed == nil or parsed < 0 or parsed ~= math.floor(parsed) then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Ignoring non-integer "' .. DEPTH_ATTRIBUTE .. '" on heading "'
+        .. pandoc.utils.stringify(header.content) .. '": "' .. raw .. '".'
+    )
+    return nil
+  end
+  return parsed
 end
 
 --- Detect the effective slide level in AST coordinates.
@@ -151,6 +188,28 @@ local function split_blocks_at_horizontal_rule(blocks)
   return pieces, found
 end
 
+--- Warn when the cloned heading chain skips a level.
+--- A non-contiguous chain (for example a `##` directly followed by a `####`
+--- with no `###` between them) typically points to an accidental gap in
+--- the source structure.
+--- @param chain table The chain of headings about to be cloned.
+local function warn_non_contiguous_chain(chain)
+  for index = 2, #chain do
+    local previous = chain[index - 1]
+    local current = chain[index]
+    if current.level > previous.level + 1 then
+      log.log_warning(
+        EXTENSION_NAME,
+        'Heading chain skips from level ' .. previous.level
+          .. ' ("' .. pandoc.utils.stringify(previous.content) .. '") '
+          .. 'to level ' .. current.level
+          .. ' ("' .. pandoc.utils.stringify(current.content) .. '") '
+          .. 'on a continuation slide; intermediate level(s) are missing.'
+      )
+    end
+  end
+end
+
 --- Hoist `---` out of a Div: when the Div directly contains one or more
 --- `HorizontalRule`s, replace it with a sequence of clones of the Div, one
 --- per non-empty fragment, separated by `HorizontalRule`s at the slide
@@ -194,7 +253,8 @@ end
 --- replace each `HorizontalRule` with clones of the heading chain
 --- from the most recent slide.
 --- Headings marked `.no-cascade` are excluded from the chain, and the
---- `depth` option limits how many heading levels of the chain are repeated.
+--- `depth` option (overridable per heading via `cascade-depth`) limits how
+--- many heading levels of the chain are repeated.
 --- For non-reveal.js formats, either keep or remove horizontal rules
 --- based on the `keep-hrule` option.
 --- Parameter and return types are provided by the Quarto Lua plugin.
@@ -211,9 +271,10 @@ function Pandoc(doc)
   end
 
   local slide_level = detect_slide_level(doc.blocks, doc.meta)
-  local depth = get_depth(doc.meta)
+  local document_depth = get_depth(doc.meta)
   local parents = {}
   local chain = {}
+  local active_depth = document_depth
   local at_slide_start = false
   local new_blocks = pandoc.Blocks({})
 
@@ -225,11 +286,13 @@ function Pandoc(doc)
           table.insert(new_parents, p)
         end
       end
+      local per_heading_depth = read_heading_depth(block)
       if not block.classes:includes('no-cascade') then
         table.insert(new_parents, block)
       end
       parents = new_parents
       chain = {}
+      active_depth = per_heading_depth or document_depth
       at_slide_start = false
       new_blocks:insert(block)
     elseif block.t == 'Header' and block.level == slide_level then
@@ -237,29 +300,38 @@ function Pandoc(doc)
       for _, p in ipairs(parents) do
         table.insert(chain, p)
       end
+      local per_heading_depth = read_heading_depth(block)
       if not block.classes:includes('no-cascade') then
         table.insert(chain, block)
       end
+      active_depth = per_heading_depth or document_depth
       at_slide_start = true
       new_blocks:insert(block)
     elseif at_slide_start and block.t == 'Header' then
+      local per_heading_depth = read_heading_depth(block)
       if not block.classes:includes('no-cascade') then
         table.insert(chain, block)
+      end
+      if per_heading_depth ~= nil then
+        active_depth = per_heading_depth
       end
       new_blocks:insert(block)
     elseif block.t == 'HorizontalRule' and #chain > 0 then
       local next_block = doc.blocks[i + 1]
       local next_is_header = next_block and next_block.t == 'Header'
       local new_chain = {}
+      local cloned = {}
       for _, h in ipairs(chain) do
-        local within_depth = not depth or (h.level - slide_level) < depth
+        local within_depth = not active_depth or (h.level - slide_level) < active_depth
         if within_depth and h.level >= slide_level and (not next_is_header or h.level < next_block.level) then
           local clone = h:clone()
           clone.identifier = ''
           new_blocks:insert(clone)
           table.insert(new_chain, clone)
+          table.insert(cloned, clone)
         end
       end
+      warn_non_contiguous_chain(cloned)
       chain = new_chain
       at_slide_start = true
     else
