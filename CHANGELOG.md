@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: warn when the cloned heading chain skips a level on a continuation slide (for example, a `##` followed by a `####` with no `###` between them).
+  The output is still produced; the warning surfaces a source structure that is likely accidental.
+- feat: add the per-heading `cascade-depth` attribute, which overrides the document-level `extensions.cascade.depth` for the chain that starts at that heading.
+- feat: reuse the canonical shared `logging.lua` module from `_modules/` for warning output, in line with the other extensions in the monorepo.
+
+### Documentation
+
+- docs: document behaviour of `---` inside code blocks and Markdown tables (passed through unchanged).
+- docs: document that orphaned parent headings can produce empty slides and how to avoid them.
+
 ## 0.5.0 (2026-05-24)
 
 ### New Features

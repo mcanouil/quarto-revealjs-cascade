@@ -105,6 +105,16 @@ This level-four heading is below the depth limit.
 Both `## Limiting the depth` and `### Level three heading` are repeated.
 The `#### Level four heading` is dropped because it sits beyond `depth: 2`.
 
+## Per-heading depth override {cascade-depth="1"}
+
+### Sub-heading kept off the chain
+
+The heading attribute `cascade-depth="1"` overrides the document-level `depth: 2` here.
+
+---
+
+Only `## Per-heading depth override` is repeated; the `### Sub-heading kept off the chain` is dropped because of the per-heading override.
+
 # Inside Blocks
 
 ## Callouts split too
