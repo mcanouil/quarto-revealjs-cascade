@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 (2026-05-31)
+
 ### New Features
 
 - feat: warn when the cloned heading chain skips a level on a continuation slide (for example, a `##` followed by a `####` with no `###` between them).
