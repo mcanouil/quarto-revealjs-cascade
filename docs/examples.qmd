@@ -1,0 +1,122 @@
+---
+title: "Examples"
+subtitle: "The source behind the deck."
+description: "Each cascade behaviour, with the source that produces it and the slides it becomes in the RevealJS preview."
+---
+
+This page is HTML, and the filter only splits slides, so the demonstration is the [RevealJS preview](preview.html) built by this same site.
+Each section below gives the source and says what the deck does with it.
+
+## Repeating the chain
+
+```markdown
+## Results
+
+### Experiment A
+
+Each `---` starts a new slide.
+
+---
+
+Written with no headings at all.
+```
+
+In the deck this is two slides, and both carry `## Results` and `### Experiment A`.
+
+A heading at the same level starts a new chain under the same parent:
+
+```markdown
+---
+
+### Experiment B
+
+A new chain under the same section.
+```
+
+The slide after it carries `## Results` and `### Experiment B`.
+
+## Limiting the depth
+
+```markdown
+## Limiting the depth {cascade-depth="1"}
+
+### A subsection
+
+---
+
+Only the slide-level heading is repeated here.
+```
+
+The continuation slide carries `## Limiting the depth` and nothing below it.
+
+The same limit can be set for a whole document instead:
+
+```yaml
+extensions:
+  cascade:
+    depth: 1
+```
+
+An attribute on a heading overrides that for the chain beginning there, and the document setting resumes at the next heading at or above slide level.
+
+## Opting a heading out
+
+```markdown
+## Opting a heading out {.no-cascade}
+
+### A subsection
+
+---
+
+Only the subsection is repeated.
+```
+
+The heading keeps its own slide but is never carried forward, so the continuation slide shows `### A subsection` alone.
+
+## Splitting inside a div
+
+```markdown
+## Inside a div
+
+::: {.callout-note}
+
+A note, first part.
+
+---
+
+Second part, on a new slide, still in the callout.
+
+:::
+```
+
+The div is closed, the chain repeated, and an identical div reopened around what follows, so both slides carry the same callout.
+
+`.panel-tabset` and cross-reference divs are the exceptions, since reopening those would break them.
+
+## Rules that are not breaks
+
+A `---` inside a fenced code block never reaches the filter, because Pandoc reads it as content:
+
+````markdown
+```
+---
+```
+````
+
+A `---` row in a pipe table is a column separator, and is left alone.
+
+## Outside RevealJS
+
+This site sets `keep-hrule: true`, so the `---` written between sections of these pages survives as a horizontal rule rather than being removed:
+
+```yaml
+extensions:
+  cascade:
+    keep-hrule: true
+```
+
+Without it, `---` is stripped from every format that is not RevealJS.
+
+## Source
+
+The repository ships a short, standalone starting point you can copy: [`example.qmd`](https://github.com/mcanouil/quarto-revealjs-cascade/blob/main/example.qmd).

@@ -1,0 +1,83 @@
+---
+title: "RevealJS Cascade"
+subtitle: "Write each heading once, on every slide it belongs to."
+description: "What the cascade extension is for, how to enable it, and how a heading chain is repeated across continuation slides."
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
+---
+
+A section of a talk rarely fits on one slide, and the moment it spills over, the headings have to be typed again on the next one.
+Rename the section later and every copy has to be found.
+
+`cascade` repeats them instead.
+Write `---` to start a new slide and the heading chain from the slide before it is carried across, so the source holds each heading once.
+
+## Installation
+
+```bash
+quarto add {{< var extension.reference >}}
+```
+
+This will install the extension under the `_extensions` subdirectory.
+If you are using version control, you will want to check in this directory.
+
+Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
+
+::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
+
+[Visual Studio Code](vscode://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Visual Studio Code using the Quarto Wizard extension."}
+[Positron](positron://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Positron using the Quarto Wizard extension."}
+[VSCodium](vscodium://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in VSCodium using the Quarto Wizard extension."}
+
+:::
+
+## Quick start
+
+```yaml
+filters:
+  - cascade
+```
+
+Then write `---` where a section spills onto another slide:
+
+```markdown
+## Results
+
+### Experiment A
+
+Observations for experiment A.
+
+---
+
+More observations, with both headings repeated for you.
+
+---
+
+### Experiment B
+
+A new chain under the same section, so only the parent is repeated.
+```
+
+## Seeing it work
+
+The site you are reading is HTML, and this filter only splits slides.
+The [RevealJS preview](preview.html) is a deck built by the same site, where every behaviour below can be stepped through.
+
+See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for the source behind each slide.
+
+## Where it works
+
+RevealJS.
+
+In every other format a `---` is removed, since there are no slides to split.
+Set `keep-hrule: true` to leave the horizontal rules in place instead.
+
+## Links
+
+- [Reference](reference.qmd) for every option and attribute.
+- [Examples](examples.qmd) for the source behind the deck.
+- [RevealJS preview](preview.html) for the deck itself.
+- [Changelog](changelog.qmd) for what each release changed.
+- [Source and issues](https://github.com/mcanouil/quarto-revealjs-cascade) on GitHub.
