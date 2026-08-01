@@ -22,10 +22,15 @@ extensions:
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `depth` | integer | unset | How many levels of the chain to repeat, counted from the slide level. Unset repeats the whole chain. |
-| `keep-hrule` | boolean | `false` | Whether `---` survives in formats other than RevealJS. |
+| `depth` | integer | unset | How many levels of the chain to repeat, counted from the slide level. Unset repeats the whole chain, and `0` repeats none of it. |
+| `keep-hrule` | boolean | `false` | Whether `---` survives in formats other than RevealJS. Only the literal `false` turns it off; any other value is read as `true`. |
 
 : Document and project options. {.striped .hover tbl-colwidths="[16,12,12,60]"}
+
+Only headings at or below the slide level are ever repeated.
+A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
+
+A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
 
 ## Per-heading control
 
@@ -57,10 +62,12 @@ Second part, still in the margin, on a new slide.
 :::
 ```
 
-Two exceptions are left alone, because reopening them would break them:
+Each reopened div is a copy of the first with its identifier removed, so a div written with an `#id` keeps it on the first slide only.
+
+Two kinds of div are left alone, because reopening them would break them:
 
 - `.panel-tabset`;
-- a cross-reference target, meaning a div whose identifier looks like `#tbl-…`, `#fig-…`, `#thm-…`, and so on.
+- any div whose identifier begins with letters followed by a hyphen. This is meant to catch a cross-reference target such as `#tbl-results` or `#fig-plot`, and it catches an ordinary identifier of the same shape, such as `#side-note`, as well.
 
 ## What is not a slide break
 
@@ -73,8 +80,10 @@ Two exceptions are left alone, because reopening them would break them:
 
 ## Warnings
 
-A cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, is reported at render time.
-The output is still produced; the warning surfaces a structure that is usually accidental.
+Two things are reported at render time, and neither stops the render:
+
+- a cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, which usually points at an accidental gap in the source;
+- a `cascade-depth` that is not a whole number of zero or more, which is ignored in favour of the document setting.
 
 ## Outside RevealJS
 

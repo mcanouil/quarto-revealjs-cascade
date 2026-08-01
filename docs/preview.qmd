@@ -1,6 +1,7 @@
 ---
 title: "Cascade in RevealJS"
 subtitle: "The heading chain, repeated for you"
+description: "A RevealJS deck built with the cascade filter, so each behaviour can be stepped through."
 format:
   revealjs:
     theme: default

@@ -107,7 +107,8 @@ A `---` row in a pipe table is a column separator, and is left alone.
 
 ## Outside RevealJS
 
-This site sets `keep-hrule: true`, so the `---` written between sections of these pages survives as a horizontal rule rather than being removed:
+There are no slides to split in HTML, PDF, or Word, so the filter takes every `---` out of them.
+A document that uses `---` as an ordinary rule as well as a slide break asks for it back:
 
 ```yaml
 extensions:
@@ -115,7 +116,8 @@ extensions:
     keep-hrule: true
 ```
 
-Without it, `---` is stripped from every format that is not RevealJS.
+This site sets it, which is why a `---` written in one of these pages would be drawn rather than dropped.
+Only the literal `false` turns it off again.
 
 ## Source
 

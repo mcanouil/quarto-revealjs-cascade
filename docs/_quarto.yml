@@ -121,6 +121,7 @@ extensions:
     # filename derived from the language would only add noise.
     auto-filename: false
   cascade:
-    # The HTML pages carry `---` between sections; without this it would be
-    # stripped from them, since only RevealJS splits on it.
+    # Only RevealJS splits on `---`, and the filter takes it out of every other
+    # format. These pages are HTML, so this keeps a rule written in one of them
+    # drawn rather than dropped.
     keep-hrule: true
