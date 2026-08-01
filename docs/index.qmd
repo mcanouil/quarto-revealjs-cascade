@@ -65,6 +65,8 @@ A new chain under the same section, so only the parent is repeated.
 The site you are reading is HTML, and this filter only splits slides.
 The [RevealJS preview](preview.html) is a deck built by the same site, where every behaviour below can be stepped through.
 
+![](preview.html){.embed-art loading="lazy" title="A deck with the heading chain repeated" style="--atelier-embed-art-ratio: 1.78;"}
+
 See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for the source behind each slide.
 
 ## Where it works
