@@ -9,7 +9,6 @@ authors:
     url: "https://mickael.canouil.fr"
 format:
   revealjs:
-    output-file: index
 filters:
   - cascade
 extensions:
@@ -17,228 +16,40 @@ extensions:
     depth: 2
 ---
 
-# The Problem
-
-## Too much content, not enough slides
-
-When a topic spans multiple slides, you end up writing the same heading over and over:
-
-```markdown
-## My Long Topic
-
-First part of the content...
-
-## My Long Topic
-
-Second part of the content...
-
-## My Long Topic
-
-Third part of the content...
-```
-
-This violates the **DRY** principle and makes refactoring painful.
-
-# The Solution
-
-## The `cascade` extension
-
-A filter that repeats the heading chain **automatically** when you use `---` to create a new slide.
-
-```markdown
-## My Long Topic
-
-First part of the content...
-
----
-
-Second part, heading repeated for you!
-```
-
-- Works only for `revealjs` output.
-- Repeats the full heading hierarchy, not just the immediate title.
-
----
-
-This very slide was created with `---`.
-
-No heading was written in the source; it was repeated from the previous slide.
-
-## Nested headings work too
-
-### Deep dive
-
-Content under a nested heading structure.
-
----
-
-### Still diving
-
-Both `## Nested headings work too` and `### Still diving` on the slide.
-Only parent headings above this `###` level are repeated from the previous slide.
-
-# Fine Tuning
-
-## Opting out with `{.no-cascade}`
-
-### A pinned subheading {.no-cascade}
-
-A heading marked `{.no-cascade}` stays here but is never repeated.
-
----
-
-Only `## Opting out with {.no-cascade}` is repeated.
-The `### A pinned subheading` is not, because of the `{.no-cascade}` class.
-
-## Limiting the depth
-
-### Level three heading
-
-This presentation sets `depth: 2`, so only the top two heading levels cascade.
-
-#### Level four heading
-
-This level-four heading is below the depth limit.
-
----
-
-Both `## Limiting the depth` and `### Level three heading` are repeated.
-The `#### Level four heading` is dropped because it sits beyond `depth: 2`.
-
-## Per-heading depth override {cascade-depth="1"}
-
-### Sub-heading kept off the chain
-
-The heading attribute `cascade-depth="1"` overrides the document-level `depth: 2` here.
-
----
-
-Only `## Per-heading depth override` is repeated; the `### Sub-heading kept off the chain` is dropped because of the per-heading override.
-
-# Inside Blocks
-
-## Callouts split too
-
-```markdown
-::: {.callout-tip title="A multi-part tip"}
-
-First half of the tip.
-
----
-
-Second half: the heading **and** the callout were repeated automatically.
-
-:::
-```
-
----
-
-::: {.callout-tip title="A multi-part tip"}
-
-First half of the tip.
-
----
-
-Second half: the heading **and** the callout were repeated automatically.
-
-:::
-
-## Regular divs split too
-
-```markdown
-::: {.column-margin}
-
-A side note, first part.
-
----
-
-Second part, still in the margin, on a new slide.
-
-:::
-```
-
----
-
-::: {.column-margin}
-
-A side note, first part.
-
----
-
-Second part, still in the margin, on a new slide.
-
-:::
-
-## Cross-reference does not break
-
-### (_i.e._, `^%a+%-` ID)
-
-```markdown
-::: {#tip-one .callout-tip title="A multi-part tip"}
-
-First half of the tip.
-
----
-
-Second half: the heading **and** the callout were repeated automatically.
-
-:::
-```
-
-::: {#tip-one .callout-tip title="A multi-part tip"}
-
-First half of the tip.
-
----
-
-Second half: the heading **and** the callout were repeated automatically.
-
-:::
-
-# Before and After
-
-## Before: repetitive markdown
-
-```markdown
 ## Results
 
 ### Experiment A
 
-Observations for experiment A...
-
-## Results
-
-### Experiment A
-
-More observations for experiment A...
-
-## Results
-
-### Experiment B
-
-Observations for experiment B...
-```
+Each `---` starts a new slide, and the heading chain above is repeated onto it.
 
 ---
 
-## After: DRY markdown
-
-```markdown
-## Results
-
-### Experiment A
-
-Observations for experiment A...
-
----
-
-More observations for experiment A...
+Written with no headings at all: both `## Results` and `### Experiment A` were repeated here.
 
 ---
 
 ### Experiment B
 
-Observations for experiment B...
-```
+A heading at this level starts a new chain under the same section, so only the parent is repeated.
 
-Fewer lines, single source of truth for headings, and zero risk of typos.
+## Limiting the depth {cascade-depth="1"}
+
+### A subsection
+
+---
+
+Only `## Limiting the depth` was repeated; `cascade-depth` limited the chain.
+
+## Opting out {.no-cascade}
+
+### A subsection
+
+---
+
+Only `### A subsection` was repeated, because the heading above carries `.no-cascade`.
+
+## More
+
+Set `depth` under `extensions.cascade` for a document-wide limit, and `keep-hrule` to keep `---` in formats other than Reveal.js.
+
+Full documentation: <https://m.canouil.dev/quarto-revealjs-cascade/>.

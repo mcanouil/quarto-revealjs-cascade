@@ -1,0 +1,62 @@
+---
+title: "Cascade in RevealJS"
+subtitle: "The heading chain, repeated for you"
+description: "A RevealJS deck built with the cascade filter, so each behaviour can be stepped through."
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+---
+
+## Results
+
+### Experiment A
+
+Each `---` below starts a new slide, and the extension repeats the heading chain on it.
+
+---
+
+This slide was written with no headings at all.
+Both `## Results` and `### Experiment A` above were repeated onto it.
+
+---
+
+### Experiment B
+
+A heading at this level starts a new chain under `## Results`, so only the parent is repeated.
+
+---
+
+Again written with no headings, and carrying the chain from Experiment B.
+
+## Limiting the depth {cascade-depth="1"}
+
+### A subsection
+
+`cascade-depth="1"` on the slide-level heading limits the chain to that heading alone.
+
+---
+
+Only `## Limiting the depth` was repeated here; the subsection was dropped.
+
+## Opting a heading out {.no-cascade}
+
+### A subsection
+
+The slide-level heading carries `.no-cascade`, so it stays on its own slide and is never carried forward.
+
+---
+
+Only `### A subsection` was repeated onto this slide.
+
+## Inside a div
+
+::: {.callout-note}
+
+A `---` inside a div splits the slide there too.
+
+---
+
+The div is closed, the chain repeated, and an identical div reopened around this.
+
+:::

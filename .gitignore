@@ -9,3 +9,5 @@ docs/api/*.qmd
 /.luarc.json
 example_files/
 example.html
+/.quarto/
+**/*.quarto_ipynb

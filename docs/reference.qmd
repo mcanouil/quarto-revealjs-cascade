@@ -1,0 +1,103 @@
+---
+title: "Reference"
+subtitle: "Every option the cascade extension accepts."
+description: "The complete cascade behaviour: the two options, the per-heading attribute and class, how divs are handled, and what happens outside RevealJS."
+---
+
+## Enabling the filter
+
+```yaml
+filters:
+  - cascade
+```
+
+## Options
+
+```yaml
+extensions:
+  cascade:
+    depth: 1
+    keep-hrule: false
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `depth` | integer | unset | How many levels of the chain to repeat, counted from the slide level. Unset repeats the whole chain, and `0` repeats none of it. |
+| `keep-hrule` | boolean | `false` | Whether `---` survives in formats other than RevealJS. Only the literal `false` turns it off; any other value is read as `true`. |
+
+: Document and project options. {.striped .hover tbl-colwidths="[16,12,12,60]"}
+
+Only headings at or below the slide level are ever repeated.
+A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
+
+A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
+
+## Per-heading control
+
+| Written on a heading | Effect |
+| --- | --- |
+| `{cascade-depth="1"}` | Overrides `depth` for the chain starting at that heading. |
+| `{.no-cascade}` | The heading stays on its own slide and is never carried forward. |
+
+: The attribute and the class. {.striped .hover tbl-colwidths="[30,70]"}
+
+An override applies to the chain that begins at the annotated heading.
+The document-level setting resumes at the next heading at or above slide level.
+
+## Divs
+
+A `---` inside a div splits the slide there too: the div is closed, the chain repeated, and an identical div reopened around what follows.
+
+```markdown
+## Results
+
+::: {.column-margin}
+
+A side note, first part.
+
+---
+
+Second part, still in the margin, on a new slide.
+
+:::
+```
+
+Each reopened div is a copy of the first with its identifier removed, so a div written with an `#id` keeps it on the first slide only.
+
+Two kinds of div are left alone, because reopening them would break them:
+
+- `.panel-tabset`;
+- any div whose identifier begins with letters followed by a hyphen. This is meant to catch a cross-reference target such as `#tbl-results` or `#fig-plot`, and it catches an ordinary identifier of the same shape, such as `#side-note`, as well.
+
+## What is not a slide break
+
+| Where the `---` is | What happens |
+| --- | --- |
+| In a fenced code block | Pandoc treats it as content, so the filter never sees it. |
+| In a pipe table | It is a column separator, and is left alone. |
+
+: Horizontal rules that are not breaks. {.striped .hover tbl-colwidths="[36,64]"}
+
+## Warnings
+
+Two things are reported at render time, and neither stops the render:
+
+- a cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, which usually points at an accidental gap in the source;
+- a `cascade-depth` that is not a whole number of zero or more, which is ignored in favour of the document setting.
+
+## Outside RevealJS
+
+`---` is removed by default, since nothing there splits into slides.
+
+```yaml
+extensions:
+  cascade:
+    keep-hrule: true
+```
+
+keeps the horizontal rules as rules.
+
+## Limitations
+
+- RevealJS only. Elsewhere the filter either removes the rules or leaves them, and repeats nothing.
+- `.panel-tabset` and cross-reference divs are not split.
