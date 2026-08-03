@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: repeat a leading heading inside every reopened div when `---` splits it, with its identifier removed.
+  A callout whose title is written as a heading kept that title on the first slide only and fell back to the generic name of its type on continuation slides.
+
 ## 1.0.1 (2026-08-01)
 
 ### Documentation

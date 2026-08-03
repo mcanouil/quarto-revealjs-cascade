@@ -23,6 +23,8 @@
 ---   and for reveal.js output only.
 ---   The full heading chain is always repeated in this case; the
 ---   heading-after-`---` shortening only applies at the top level.
+---   When the Div opens with a heading, that heading is repeated inside
+---   every reopened Div, so a callout titled by a heading keeps its title.
 ---
 ---   For non-reveal.js formats, behaviour depends on the `keep-hrule` option
 ---   (default: `true`).
@@ -214,7 +216,10 @@ end
 --- `HorizontalRule`s, replace it with a sequence of clones of the Div, one
 --- per non-empty fragment, separated by `HorizontalRule`s at the slide
 --- level. The identifier is cleared on every clone after the first to avoid
---- duplicate IDs. Only applies to reveal.js output; `.panel-tabset` Divs and
+--- duplicate IDs. When the Div opens with a heading, that heading is
+--- repeated at the top of every clone after the first, so a callout titled
+--- by a heading keeps its title on continuation slides.
+--- Only applies to reveal.js output; `.panel-tabset` Divs and
 --- cross-reference targets (identifier of the form `<type>-<label>`, e.g.
 --- `tbl-results`, `fig-plot`, `thm-main`) are left untouched.
 --- Parameter and return types are provided by the Quarto Lua plugin.
@@ -232,6 +237,10 @@ function Div(div)
   if not found then
     return nil
   end
+  local title = nil
+  if div.content[1] and div.content[1].t == 'Header' then
+    title = div.content[1]
+  end
   local blocks = pandoc.Blocks({})
   for index, piece in ipairs(pieces) do
     local not_first = index > 1
@@ -240,10 +249,16 @@ function Div(div)
     end
     if #piece > 0 then
       local attr = div.attr:clone()
+      local content = pandoc.Blocks(piece)
       if not_first then
         attr.identifier = ''
+        if title then
+          local clone = title:clone()
+          clone.identifier = ''
+          content:insert(1, clone)
+        end
       end
-      blocks:insert(pandoc.Div(pandoc.Blocks(piece), attr))
+      blocks:insert(pandoc.Div(content, attr))
     end
   end
   return blocks
