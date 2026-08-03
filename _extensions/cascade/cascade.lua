@@ -51,12 +51,11 @@
 ---
 ---   Headings below the slide level create section wrappers in reveal.js
 ---   output, so they are skipped when cloning the chain on `---` slides.
----   Accounts for `shift-heading-level-by` (applied after filters run) by
----   combining the metadata value with an AST scan: the metadata shift is
----   authoritative when present, and the AST scan recovers the correct
----   slide level when shift is set under a format-scoped option (e.g.
----   `format.revealjs.shift-heading-level-by`) that is not yet flattened
----   onto `doc.meta` when the filter runs.
+---   Quarto treats `shift-heading-level-by` as a pandoc option and applies it
+---   after filters run, so no channel exposes it to this filter. A document
+---   that sets it must declare the same value as `extensions.cascade.shift`,
+---   which is subtracted from the writer's slide level to give the slide
+---   level in AST coordinates.
 
 local EXTENSION_NAME = 'cascade'
 local DEPTH_ATTRIBUTE = 'cascade-depth'
@@ -64,19 +63,27 @@ local DEPTH_ATTRIBUTE = 'cascade-depth'
 --- Load the shared logging module bundled with this extension.
 local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
 
+--- Read a raw `extensions.cascade.<key>` value from document metadata.
+--- @param meta pandoc.Meta The document metadata.
+--- @param key string The option name.
+--- @return any|nil The metadata value, or `nil` when the option is unset.
+local function get_option(meta, key)
+  local extensions = meta['extensions']
+  if not extensions then
+    return nil
+  end
+  local cascade = extensions['cascade']
+  if not cascade then
+    return nil
+  end
+  return cascade[key]
+end
+
 --- Read the `keep-hrule` extension option from document metadata.
 --- @param meta pandoc.Meta The document metadata.
 --- @return boolean Whether to keep horizontal rules in non-reveal.js formats.
 local function get_keep_hrule(meta)
-  local extensions = meta['extensions']
-  if not extensions then
-    return false
-  end
-  local cascade = extensions['cascade']
-  if not cascade then
-    return false
-  end
-  local keep = cascade['keep-hrule']
+  local keep = get_option(meta, 'keep-hrule')
   if keep == nil then
     return false
   end
@@ -88,19 +95,34 @@ end
 --- @return integer|nil The maximum number of heading levels to repeat, or
 ---   `nil` when no limit is set.
 local function get_depth(meta)
-  local extensions = meta['extensions']
-  if not extensions then
-    return nil
-  end
-  local cascade = extensions['cascade']
-  if not cascade then
-    return nil
-  end
-  local depth = cascade['depth']
+  local depth = get_option(meta, 'depth')
   if depth == nil then
     return nil
   end
   return tonumber(pandoc.utils.stringify(depth))
+end
+
+--- Read the `shift` extension option from document metadata.
+--- Mirrors the `shift-heading-level-by` applied to the document, which Quarto
+--- never exposes to a filter. Emits a warning and returns `0` when the value
+--- is not a whole number.
+--- @param meta pandoc.Meta The document metadata.
+--- @return integer The heading level shift, or `0` when unset.
+local function get_shift(meta)
+  local raw = get_option(meta, 'shift')
+  if raw == nil then
+    return 0
+  end
+  local text = pandoc.utils.stringify(raw)
+  local parsed = tonumber(text)
+  if parsed == nil or parsed ~= math.floor(parsed) then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Ignoring non-integer "shift" option: "' .. text .. '".'
+    )
+    return 0
+  end
+  return parsed
 end
 
 --- Parse a per-heading `cascade-depth` attribute as a non-negative integer.
@@ -130,43 +152,16 @@ end
 --- Detect the effective slide level in AST coordinates.
 --- `PANDOC_WRITER_OPTIONS.slide_level` is the writer's (post-shift) slide
 --- level. The AST still has pre-shift heading levels, so the AST slide
---- level is `slide_level - shift`.
---- The shift is read from metadata when available; otherwise, the AST is
---- scanned for the smallest heading level whose `Header` is directly
---- followed by non-`Header` content (mirrors pandoc's auto slide-level
---- algorithm) and used to escalate the slide level when it indicates a
---- deeper effective level than the metadata path.
---- @param blocks pandoc.Blocks The document blocks.
+--- level is `slide_level - shift`, with the shift taken from the
+--- `extensions.cascade.shift` option.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer The slide level in AST coordinates.
-local function detect_slide_level(blocks, meta)
+local function detect_slide_level(meta)
   local slide_level = 2
   if PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.slide_level then
     slide_level = PANDOC_WRITER_OPTIONS.slide_level
   end
-  local shift_meta = meta['shift-heading-level-by']
-  local shift = 0
-  if shift_meta then
-    shift = tonumber(pandoc.utils.stringify(shift_meta)) or 0
-  end
-  local ast_slide_level = slide_level - shift
-  if shift == 0 then
-    local from_ast = nil
-    for i, block in ipairs(blocks) do
-      if block.t == 'Header' then
-        local next_block = blocks[i + 1]
-        if next_block and next_block.t ~= 'Header' then
-          if not from_ast or block.level < from_ast then
-            from_ast = block.level
-          end
-        end
-      end
-    end
-    if from_ast and from_ast > ast_slide_level then
-      ast_slide_level = from_ast
-    end
-  end
-  return ast_slide_level
+  return slide_level - get_shift(meta)
 end
 
 --- Split a list of blocks into pieces wherever a `HorizontalRule` occurs.
@@ -285,7 +280,7 @@ function Pandoc(doc)
     return doc
   end
 
-  local slide_level = detect_slide_level(doc.blocks, doc.meta)
+  local slide_level = detect_slide_level(doc.meta)
   local document_depth = get_depth(doc.meta)
   local parents = {}
   local chain = {}

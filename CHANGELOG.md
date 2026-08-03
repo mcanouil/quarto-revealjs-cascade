@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: add the `extensions.cascade.shift` option, declaring the `shift-heading-level-by` applied to the document.
+  Quarto treats `shift-heading-level-by` as a Pandoc option, applies it after filters run, and passes it to no filter, wherever it is written; the filter has to be told.
+
+### Bug Fixes
+
+- fix: drop the AST scan that guessed the slide level, which raised it on any slide whose heading was directly followed by a deeper heading.
+  The slide heading was then read as a section parent and dropped from the chain, and the `---` produced no continuation slide at all.
+  The slide level now comes from the RevealJS `slide-level` and the `shift` option alone, so it no longer depends on the shape of the document.
+
+> [!WARNING]
+> A document that sets `shift-heading-level-by`, at the top level or under a format, now has to mirror the value as `extensions.cascade.shift`.
+> Without it the chain is read one level off and each `---` produces a duplicate section slide.
+
 ## 1.0.2 (2026-08-03)
 
 ### Bug Fixes

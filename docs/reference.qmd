@@ -1,7 +1,7 @@
 ---
 title: "Reference"
 subtitle: "Every option the cascade extension accepts."
-description: "The complete cascade behaviour: the two options, the per-heading attribute and class, how divs are handled, and what happens outside RevealJS."
+description: "The complete cascade behaviour: every option, the per-heading attribute and class, how divs are handled, and what happens outside RevealJS."
 ---
 
 ## Enabling the filter
@@ -18,12 +18,14 @@ extensions:
   cascade:
     depth: 1
     keep-hrule: false
+    shift: 0
 ```
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `depth` | integer | unset | How many levels of the chain to repeat, counted from the slide level. Unset repeats the whole chain, and `0` repeats none of it. |
 | `keep-hrule` | boolean | `false` | Whether `---` survives in formats other than RevealJS. Only the literal `false` turns it off; any other value is read as `true`. |
+| `shift` | integer | `0` | The `shift-heading-level-by` applied to the document. May be negative. A value that is not a whole number is reported and ignored. |
 
 : Document and project options. {.striped .hover tbl-colwidths="[16,12,12,60]"}
 
@@ -31,6 +33,24 @@ Only headings at or below the slide level are ever repeated.
 A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
 
 A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
+
+### Shifted heading levels
+
+The filter has to know which heading level makes a slide, and it works that out from the RevealJS `slide-level`, `2` unless the document says otherwise.
+`shift-heading-level-by` moves every heading under that line, and Quarto treats it as a Pandoc option: it is applied after the filter has run and is passed to no filter, whether it is written at the top of the document or under a format.
+A document that sets it therefore has to say so a second time.
+
+```yaml
+extensions:
+  cascade:
+    shift: -1
+
+format:
+  revealjs:
+    shift-heading-level-by: -1
+```
+
+Leave the two out of step and the chain is read one level off: the heading that starts a section is treated as a slide heading and repeated, so each `---` produces a duplicate section slide.
 
 ## Per-heading control
 
@@ -83,10 +103,11 @@ Two kinds of div are left alone, because reopening them would break them:
 
 ## Warnings
 
-Two things are reported at render time, and neither stops the render:
+Three things are reported at render time, and none of them stops the render:
 
 - a cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, which usually points at an accidental gap in the source;
-- a `cascade-depth` that is not a whole number of zero or more, which is ignored in favour of the document setting.
+- a `cascade-depth` that is not a whole number of zero or more, which is ignored in favour of the document setting;
+- a `shift` that is not a whole number, which is ignored in favour of `0`.
 
 ## Outside RevealJS
 
