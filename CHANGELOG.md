@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.2 (2026-08-03)
+
 ### Bug Fixes
 
 - fix: repeat a leading heading inside every reopened div when `---` splits it, with its identifier removed.
