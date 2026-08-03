@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-08-03)
+
 ### WARNING
 
 A document that sets `shift-heading-level-by`, at the top level or under a format, now has to mirror the value as `extensions.cascade.shift`.
