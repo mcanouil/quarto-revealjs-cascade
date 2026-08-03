@@ -7,7 +7,7 @@ Follow the DRY principle: write each heading once and let the filter handle the 
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-revealjs-cascade@1.0.2
+quarto add mcanouil/quarto-revealjs-cascade@2.0.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
