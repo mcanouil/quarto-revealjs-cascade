@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### WARNING
+
+A document that sets `shift-heading-level-by`, at the top level or under a format, now has to mirror the value as `extensions.cascade.shift`.
+Without it the chain is read one level off and each `---` produces a duplicate section slide.
+
 ### New Features
 
 - feat: add the `extensions.cascade.shift` option, declaring the `shift-heading-level-by` applied to the document.
@@ -15,10 +20,6 @@
   The slide level now comes from the RevealJS `slide-level` and the `shift` option alone, so it no longer depends on the shape of the document.
 - fix: report a `depth` that is not a whole number of zero or more, instead of accepting it silently.
   A negative `depth` repeated no heading at all, and a non-numeric one was read as no limit, in both cases without a word.
-
-> [!WARNING]
-> A document that sets `shift-heading-level-by`, at the top level or under a format, now has to mirror the value as `extensions.cascade.shift`.
-> Without it the chain is read one level off and each `---` produces a duplicate section slide.
 
 ## 1.0.2 (2026-08-03)
 
