@@ -13,6 +13,8 @@
 - fix: drop the AST scan that guessed the slide level, which raised it on any slide whose heading was directly followed by a deeper heading.
   The slide heading was then read as a section parent and dropped from the chain, and the `---` produced no continuation slide at all.
   The slide level now comes from the RevealJS `slide-level` and the `shift` option alone, so it no longer depends on the shape of the document.
+- fix: report a `depth` that is not a whole number of zero or more, instead of accepting it silently.
+  A negative `depth` repeated no heading at all, and a non-numeric one was read as no limit, in both cases without a word.
 
 > [!WARNING]
 > A document that sets `shift-heading-level-by`, at the top level or under a format, now has to mirror the value as `extensions.cascade.shift`.

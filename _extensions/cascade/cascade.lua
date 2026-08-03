@@ -92,21 +92,31 @@ local function get_keep_hrule(meta)
 end
 
 --- Read the `depth` extension option from document metadata.
+--- Emits a warning and returns `nil` when the value is not a non-negative
+--- integer.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer|nil The maximum number of heading levels to repeat, or
 ---   `nil` when no limit is set.
 local function get_depth(meta)
-  local depth = get_option(meta, 'depth')
-  if depth == nil then
+  local raw = get_option(meta, 'depth')
+  if raw == nil then
     return nil
   end
-  return tonumber(pandoc.utils.stringify(depth))
+  local text = pandoc.utils.stringify(raw)
+  local parsed = tonumber(text)
+  if parsed == nil or parsed < 0 or parsed ~= math.floor(parsed) then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Ignoring "depth" option "' .. text .. '": expected a whole number of '
+        .. 'zero or more. Repeating the whole chain.'
+    )
+    return nil
+  end
+  return parsed
 end
 
 --- Read the `shift` extension option from document metadata.
---- Mirrors the `shift-heading-level-by` applied to the document, which Quarto
---- never exposes to a filter. Emits a warning and returns `0` when the value
---- is not a whole number.
+--- Emits a warning and returns `0` when the value is not a whole number.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer The heading level shift, or `0` when unset.
 local function get_shift(meta)
@@ -119,7 +129,7 @@ local function get_shift(meta)
   if parsed == nil or parsed ~= math.floor(parsed) then
     log.log_warning(
       EXTENSION_NAME,
-      'Ignoring non-integer "shift" option: "' .. text .. '".'
+      'Ignoring "shift" option "' .. text .. '": expected a whole number.'
     )
     return 0
   end
