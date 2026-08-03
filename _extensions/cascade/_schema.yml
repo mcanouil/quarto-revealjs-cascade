@@ -13,6 +13,11 @@ options:
     minimum: 0
     description: >
       Maximum number of heading levels of the chain to repeat on continuation slides, counted from the slide level.
+  shift:
+    type: integer
+    default: 0
+    description: >
+      The value of `shift-heading-level-by` applied to the document, which Quarto does not expose to filters.
 
 attributes:
   _any:
