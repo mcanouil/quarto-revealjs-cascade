@@ -64,6 +64,9 @@ Second part, still in the margin, on a new slide.
 
 Each reopened div is a copy of the first with its identifier removed, so a div written with an `#id` keeps it on the first slide only.
 
+When the div opens with a heading, that heading is repeated inside every reopened div, with its identifier removed.
+A callout whose title is written as a heading therefore keeps that title on continuation slides, instead of falling back to the generic name of its type.
+
 Two kinds of div are left alone, because reopening them would break them:
 
 - `.panel-tabset`;

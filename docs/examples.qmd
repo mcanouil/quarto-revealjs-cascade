@@ -90,6 +90,7 @@ Second part, on a new slide, still in the callout.
 ```
 
 The div is closed, the chain repeated, and an identical div reopened around what follows, so both slides carry the same callout.
+A title written as a heading at the top of the div is repeated too, so a titled callout keeps its title on the continuation slide.
 
 `.panel-tabset` and cross-reference divs are the exceptions, since reopening those would break them.
 
