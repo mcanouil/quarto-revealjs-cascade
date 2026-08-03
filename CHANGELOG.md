@@ -6,6 +6,7 @@
 
 - feat: add the `extensions.cascade.shift` option, declaring the `shift-heading-level-by` applied to the document.
   Quarto treats `shift-heading-level-by` as a Pandoc option, applies it after filters run, and passes it to no filter, wherever it is written; the filter has to be told.
+  A value that is not a whole number, or that moves the slide level outside the range 1 to 6, is reported and ignored.
 
 ### Bug Fixes
 

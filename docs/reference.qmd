@@ -25,7 +25,7 @@ extensions:
 | --- | --- | --- | --- |
 | `depth` | integer | unset | How many levels of the chain to repeat, counted from the slide level. Unset repeats the whole chain, and `0` repeats none of it. |
 | `keep-hrule` | boolean | `false` | Whether `---` survives in formats other than RevealJS. Only the literal `false` turns it off; any other value is read as `true`. |
-| `shift` | integer | `0` | The `shift-heading-level-by` applied to the document. May be negative. A value that is not a whole number is reported and ignored. |
+| `shift` | integer | `0` | The `shift-heading-level-by` applied to the document. May be negative. A value that is not a whole number, or that moves the slide level outside the range 1 to 6, is reported and ignored. |
 
 : Document and project options. {.striped .hover tbl-colwidths="[16,12,12,60]"}
 
@@ -103,11 +103,12 @@ Two kinds of div are left alone, because reopening them would break them:
 
 ## Warnings
 
-Three things are reported at render time, and none of them stops the render:
+Four things are reported at render time, and none of them stops the render:
 
 - a cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, which usually points at an accidental gap in the source;
 - a `cascade-depth` that is not a whole number of zero or more, which is ignored in favour of the document setting;
-- a `shift` that is not a whole number, which is ignored in favour of `0`.
+- a `shift` that is not a whole number, which is ignored in favour of `0`;
+- a `shift` that moves the slide level outside the range 1 to 6, which would leave every chain empty and repeat nothing, and is ignored in favour of `0`.
 
 ## Outside RevealJS
 

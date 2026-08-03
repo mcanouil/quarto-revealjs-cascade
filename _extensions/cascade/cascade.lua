@@ -59,6 +59,7 @@
 
 local EXTENSION_NAME = 'cascade'
 local DEPTH_ATTRIBUTE = 'cascade-depth'
+local MAXIMUM_HEADING_LEVEL = 6
 
 --- Load the shared logging module bundled with this extension.
 local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
@@ -154,6 +155,9 @@ end
 --- level. The AST still has pre-shift heading levels, so the AST slide
 --- level is `slide_level - shift`, with the shift taken from the
 --- `extensions.cascade.shift` option.
+--- A shift that puts the result outside the range of a heading level makes
+--- every chain empty, so no `---` would produce a slide break. That is
+--- always a mistake in the option, so it is reported and the shift ignored.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer The slide level in AST coordinates.
 local function detect_slide_level(meta)
@@ -161,7 +165,18 @@ local function detect_slide_level(meta)
   if PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.slide_level then
     slide_level = PANDOC_WRITER_OPTIONS.slide_level
   end
-  return slide_level - get_shift(meta)
+  local shift = get_shift(meta)
+  local ast_slide_level = slide_level - shift
+  if ast_slide_level < 1 or ast_slide_level > MAXIMUM_HEADING_LEVEL then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Ignoring "shift" option ' .. shift .. ': it puts the slide level at '
+        .. ast_slide_level .. ', outside the range 1 to '
+        .. MAXIMUM_HEADING_LEVEL .. ', which would repeat no heading at all.'
+    )
+    return slide_level
+  end
+  return ast_slide_level
 end
 
 --- Split a list of blocks into pieces wherever a `HorizontalRule` occurs.
