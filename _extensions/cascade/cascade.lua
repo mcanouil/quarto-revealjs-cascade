@@ -62,7 +62,22 @@ local DEPTH_ATTRIBUTE = 'cascade-depth'
 local MAXIMUM_HEADING_LEVEL = 6
 
 --- Load the shared logging module bundled with this extension.
-local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
+local schema = require(quarto.utils.resolve_path('_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', ''))
+local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', ''))
+
+--- The schema check, built once and reused for the whole document. It reads
+--- `_schema.yml` on the way in and checks the document configuration once.
+---
+--- The validator is injected rather than required by the check module, so the
+--- two vendored sources stay independent of where the other was placed.
+---
+--- The extension contributes a filter and no shortcode, so the check runs from
+--- the document handler, at the top, before the first option is read.
+---
+--- A schema that cannot be read is reported by the module as an error and the
+--- render carries on: a configuration file must not stop a document.
+local checker = check.new(schema, EXTENSION_NAME)
 
 --- Read a raw `extensions.cascade.<key>` value from document metadata.
 --- @param meta pandoc.Meta The document metadata.
@@ -294,6 +309,8 @@ end
 --- based on the `keep-hrule` option.
 --- Parameter and return types are provided by the Quarto Lua plugin.
 function Pandoc(doc)
+  checker:options(doc.meta)
+
   if not quarto.doc.is_format('revealjs') then
     local keep_hrule = get_keep_hrule(doc.meta)
     if keep_hrule then
