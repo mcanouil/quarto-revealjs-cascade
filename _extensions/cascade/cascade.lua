@@ -62,7 +62,7 @@ local DEPTH_ATTRIBUTE = 'cascade-depth'
 local MAXIMUM_HEADING_LEVEL = 6
 
 --- Load the shared logging module bundled with this extension.
-local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 
 --- Read a raw `extensions.cascade.<key>` value from document metadata.
 --- @param meta pandoc.Meta The document metadata.
