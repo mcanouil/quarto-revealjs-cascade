@@ -27,7 +27,7 @@
 ---   every reopened Div, so a callout titled by a heading keeps its title.
 ---
 ---   For non-reveal.js formats, behaviour depends on the `keep-hrule` option
----   (default: `true`).
+---   (default: `false`).
 ---   When `false`, horizontal rules are removed from the output.
 ---
 ---   The filter runs at the `pre-ast` entry point, before Quarto normalises
@@ -158,17 +158,19 @@ end
 --- @return integer|nil The parsed depth, or `nil` to fall back to the
 ---   document-level setting.
 local function read_heading_depth(header)
-  local raw = header.attributes[DEPTH_ATTRIBUTE]
-  if raw == nil then
+  local resolved = checker:attributes(header.attributes, nil) or {}
+  local written = header.attributes[DEPTH_ATTRIBUTE]
+  header.attributes[DEPTH_ATTRIBUTE] = nil
+  if written == nil then
     return nil
   end
-  header.attributes[DEPTH_ATTRIBUTE] = nil
-  local parsed = tonumber(raw)
+  local value = resolved[DEPTH_ATTRIBUTE]
+  local parsed = type(value) == 'number' and value or nil
   if parsed == nil or parsed < 0 or parsed ~= math.floor(parsed) then
     log.log_warning(
       EXTENSION_NAME,
       'Ignoring non-integer "' .. DEPTH_ATTRIBUTE .. '" on heading "'
-        .. pandoc.utils.stringify(header.content) .. '": "' .. raw .. '".'
+        .. pandoc.utils.stringify(header.content) .. '": "' .. written .. '".'
     )
     return nil
   end
