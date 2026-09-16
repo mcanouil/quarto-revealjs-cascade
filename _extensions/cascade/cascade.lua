@@ -27,7 +27,7 @@
 ---   every reopened Div, so a callout titled by a heading keeps its title.
 ---
 ---   For non-reveal.js formats, behaviour depends on the `keep-hrule` option
----   (default: `true`).
+---   (default: `false`).
 ---   When `false`, horizontal rules are removed from the output.
 ---
 ---   The filter runs at the `pre-ast` entry point, before Quarto normalises
