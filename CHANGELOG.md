@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Read the cascade depth attribute through the schema, so a rejected value is reported instead of silently changing which headings repeat. (#42)
+
 ### Documentation
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#39)
+- docs: Correct the documented default of keep-hrule from true to false. (#42)
 
 ### Refactoring
 
