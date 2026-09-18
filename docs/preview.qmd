@@ -39,15 +39,25 @@ Again written with no headings, and carrying the chain from Experiment B.
 
 Only `## Limiting the depth` was repeated here; the subsection was dropped.
 
-## Opting a heading out {.no-cascade}
+## Opting a heading out
 
-### A subsection
+### An aside {.no-cascade}
 
-The slide-level heading carries `.no-cascade`, so it stays on its own slide and is never carried forward.
+The subsection carries `.no-cascade`, so it is never carried forward.
 
 ---
 
-Only `### A subsection` was repeated onto this slide.
+Only `## Opting a heading out` was repeated onto this slide.
+
+## A slide-level heading that opts out {.no-cascade}
+
+### A subsection
+
+This heading carries `.no-cascade` as well, so the chain keeps no heading at slide level.
+
+---
+
+Nothing starts a new slide here, so this text stays on the slide above, under a second copy of `### A subsection`.
 
 ## Inside a div
 
@@ -58,5 +68,19 @@ A `---` inside a div splits the slide there too.
 ---
 
 The div is closed, the chain repeated, and an identical div reopened around this.
+
+:::
+
+## A callout with a title
+
+::: {.callout-tip}
+
+## Remember this
+
+A title written as a heading is repeated inside every reopened div.
+
+---
+
+The title above came with this copy of the callout.
 
 :::
