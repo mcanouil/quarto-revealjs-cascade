@@ -32,12 +32,17 @@ extensions:
 Only headings at or below the slide level are ever repeated.
 A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
 
-A heading joins the chain when it comes directly after the slide-level heading, directly after another heading already in the chain, or directly after a `---`.
+A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---`.
 A heading written after body text is not collected, and is not repeated.
+A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 The repeated slide-level heading is what starts the continuation slide.
 A chain left with no heading at slide level therefore starts no slide, and the content under the `---` stays on the slide above.
 `depth: 0` and `cascade-depth="0"` both leave the chain empty, and `.no-cascade` on a slide-level heading leaves it without its top.
+
+An empty chain holds for the first `---` alone.
+The filter passes over a `---` that has no chain to repeat, so a second `---` under the same heading stays in the output and RevealJS starts a slide with no heading on it.
+A chain that keeps a heading below the slide level is not empty, so every `---` under such a heading is absorbed the same way.
 
 A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
 

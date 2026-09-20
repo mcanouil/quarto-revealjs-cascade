@@ -66,8 +66,9 @@ The second `---` is followed by body text, so the third slide carries all three 
 
 ## Where the chain is collected
 
-A heading joins the chain when it comes directly after the slide-level heading, directly after another heading already in the chain, or directly after a `---`.
+A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---`.
 A heading written after body text keeps its own place in the slide and is never repeated.
+A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 ```markdown
 ## Results
@@ -138,7 +139,7 @@ extensions:
 ### A depth of zero
 
 The filter replaces each `---` with the headings it repeats, and the repeated slide-level heading is what starts the new slide.
-A depth of `0` repeats no heading, so no slide starts and the text that follows the rule stays on the slide above.
+A depth of `0` repeats no heading, so the first `---` starts no slide and the text under it stays on the slide above.
 
 ```markdown
 ## Results
@@ -153,6 +154,22 @@ This text stays on the slide above.
 ```
 
 `cascade-depth="0"` does the same for the chain that starts at the heading carrying it.
+
+A second `---` under the same heading behaves differently, because the chain is empty by then and the filter passes over a rule it has nothing to repeat for:
+
+```markdown
+## Results
+
+Body of the slide.
+
+---
+
+This text stays on the slide above.
+
+---
+
+This text starts a slide with no heading on it.
+```
 
 ## Opting a heading out
 
