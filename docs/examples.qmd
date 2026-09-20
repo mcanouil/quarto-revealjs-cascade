@@ -308,7 +308,8 @@ Body of the second slide.
 ```
 
 The second slide carries `### Experiment A` alone.
-`# Part one` and `## Results` are above the slide level, so each keeps its own section slide and neither is repeated.
+`## Results` is above the slide level, so it keeps its own section slide and is not repeated.
+`shift-heading-level-by: -1` moves `# Part one` to level 0, which Pandoc reads as the document title, so it names the deck instead of starting a slide.
 
 Leave `shift` out and the filter reads the slide level as 2.
 It then treats `## Results` as a slide heading and repeats it, so the `---` produces a duplicate section slide before the continuation.

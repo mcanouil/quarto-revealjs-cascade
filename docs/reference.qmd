@@ -64,7 +64,7 @@ Leave the two out of step and the chain is read one level off: the heading that 
 | Written on a heading | Effect |
 | --- | --- |
 | `{cascade-depth="1"}` | Overrides `depth` for the chain starting at that heading. |
-| `{.no-cascade}` | The heading stays on its own slide and is never carried forward. |
+| `{.no-cascade}` | The heading keeps its place in the source, and is never carried forward. |
 
 : The attribute and the class. {.striped .hover tbl-colwidths="[30,70]"}
 
