@@ -32,8 +32,9 @@ extensions:
 Only headings at or below the slide level are ever repeated.
 A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
 
-A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---`.
+A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---` the filter absorbed.
 A heading written after body text is not collected, and is not repeated.
+A heading under a `---` the filter passed over is not collected either, since that rule started no chain.
 A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 The repeated slide-level heading is what starts the continuation slide.

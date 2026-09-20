@@ -66,8 +66,9 @@ The second `---` is followed by body text, so the third slide carries all three 
 
 ## Where the chain is collected
 
-A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---`.
+A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---` the filter absorbed.
 A heading written after body text keeps its own place in the slide and is never repeated.
+A heading under a `---` the filter passed over is not collected either, since that rule started no chain.
 A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 ```markdown

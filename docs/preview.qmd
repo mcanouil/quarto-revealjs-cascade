@@ -53,7 +53,7 @@ Only `## Opting a heading out` was repeated onto this slide.
 
 ### A subsection
 
-This heading carries `.no-cascade` as well, so the chain keeps no heading at slide level.
+The slide heading above carries `.no-cascade`, so the chain keeps no heading at slide level.
 
 ---
 
