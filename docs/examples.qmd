@@ -192,6 +192,8 @@ The aside keeps its own place in the slide and is never carried forward, so the 
 
 A slide-level heading marked `.no-cascade` leaves the chain with no heading at slide level.
 Nothing then starts a new slide, and the rest of the chain is repeated in place, on the slide above.
+That needs a rest of the chain to repeat.
+Mark a slide-level heading `.no-cascade` with no other heading under it and the chain is empty, so the `---` stays in the document and starts a slide with no heading on it.
 
 ```markdown
 ## Opting a heading out {.no-cascade}

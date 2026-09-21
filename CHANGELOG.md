@@ -11,7 +11,7 @@
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#39)
 - docs: Correct the documented default of keep-hrule from true to false. (#42)
-- docs: Add worked examples for the shift option, the slide level, the divs the filter leaves alone, and the messages it reports. Correct what the pages say about a slide-level heading marked `.no-cascade`, which starts no continuation slide.
+- docs: Add worked examples for the shift option, the slide level, the divs the filter leaves alone, and the messages it reports. Correct what the pages say about a slide-level heading marked `.no-cascade`, which starts no continuation slide. (#43)
 
 ### Refactoring
 

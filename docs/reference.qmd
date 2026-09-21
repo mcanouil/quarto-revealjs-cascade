@@ -38,12 +38,14 @@ A heading under a `---` the filter passed over is not collected either, since th
 A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 The repeated slide-level heading is what starts the continuation slide.
-A chain left with no heading at slide level therefore starts no slide, and the content under the `---` stays on the slide above.
-`depth: 0` and `cascade-depth="0"` both leave the chain empty, and `.no-cascade` on a slide-level heading leaves it without its top.
+The filter takes a `---` out of the document only while the chain still holds a heading, and it repeats the headings that survive the depth limit.
+So a chain that holds headings but none at slide level starts no slide, and the content under the `---` stays on the slide above.
+`depth: 0` and `cascade-depth="0"` both drop every heading from the repeat, and `.no-cascade` on a slide-level heading drops the top of the chain.
 
-An empty chain holds for the first `---` alone.
-The filter passes over a `---` that has no chain to repeat, so a second `---` under the same heading stays in the output and RevealJS starts a slide with no heading on it.
-A chain that keeps a heading below the slide level is not empty, so every `---` under such a heading is absorbed the same way.
+A chain with nothing in it at all behaves the other way round.
+The filter leaves such a `---` in the document, and RevealJS starts a slide with no heading on it.
+Two routes reach that state: a slide-level heading marked `.no-cascade` with no other heading in its chain, where the first `---` already survives, and a `depth: 0` chain after its first `---`, which empties the chain and lets every later `---` through.
+A chain that keeps a heading below the slide level is never empty, so every `---` under such a heading is absorbed.
 
 A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
 
@@ -78,7 +80,8 @@ An override applies to the chain that begins at the annotated heading.
 The document-level setting resumes at the next heading at or above slide level.
 
 A heading below the slide level marked `.no-cascade` keeps its own place in the slide, and the `---` under it still starts a slide from the rest of the chain.
-A slide-level heading marked `.no-cascade` leaves the chain without a heading at slide level, so a `---` under it starts no slide at all.
+A slide-level heading marked `.no-cascade` leaves the chain without a heading at slide level, so a `---` under it starts no slide while the chain still holds a heading below that level.
+With nothing else in the chain the `---` survives instead, and starts a slide with no heading on it.
 
 ## Divs
 
@@ -129,7 +132,7 @@ The filter reports four things, and none of them stops the render:
 The extension also checks what the document wrote against its own schema, before the filter reads an option.
 A key the schema does not declare in `extensions.cascade` is reported as a warning, and ignored.
 A value there of a type the schema does not accept is reported as an error, and the render still completes.
-A `cascade-depth` the schema does not accept is reported as a warning, because the attribute stays on its heading whatever the schema says.
+A `cascade-depth` the schema does not accept is reported as a warning, since the attribute only ever overrides the document setting and the filter falls back to it.
 
 One mistake can therefore produce two messages.
 A `depth`, a `shift`, or a `cascade-depth` the schema rejects is named by the schema check, and then by the filter, which says what it does instead.
