@@ -38,14 +38,15 @@ A heading under a `---` the filter passed over is not collected either, since th
 A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
 
 The repeated slide-level heading is what starts the continuation slide.
-The filter takes a `---` out of the document only while the chain still holds a heading, and it repeats the headings that survive the depth limit.
-So a chain that holds headings but none at slide level starts no slide, and the content under the `---` stays on the slide above.
-`depth: 0` and `cascade-depth="0"` both drop every heading from the repeat, and `.no-cascade` on a slide-level heading drops the top of the chain.
+The filter takes a `---` out of the document only while the chain holds at least one heading.
+So a `---` whose chain holds headings, none of them at slide level, starts no slide, and the content under it stays on the slide above.
+A `---` whose chain is empty stays in the document instead, and RevealJS starts a slide with no heading on it.
 
-A chain with nothing in it at all behaves the other way round.
-The filter leaves such a `---` in the document, and RevealJS starts a slide with no heading on it.
-Two routes reach that state: a slide-level heading marked `.no-cascade` with no other heading in its chain, where the first `---` already survives, and a `depth: 0` chain after its first `---`, which empties the chain and lets every later `---` through.
-A chain that keeps a heading below the slide level is never empty, so every `---` under such a heading is absorbed.
+What the chain holds changes as the document goes.
+A heading above the slide level clears it.
+A slide-level heading restarts it from the headings above that level.
+A heading marked `.no-cascade` stays out of it.
+Each repeat then replaces the chain with the headings that repeat wrote, which can be none: `depth: 0` and `cascade-depth="0"` write none, and a `---` followed by a heading writes only the headings above that heading's level.
 
 A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
 

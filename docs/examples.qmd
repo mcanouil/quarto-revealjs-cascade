@@ -66,10 +66,8 @@ The second `---` is followed by body text, so the third slide carries all three 
 
 ## Where the chain is collected
 
-A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---` the filter absorbed.
-A heading written after body text keeps its own place in the slide and is never repeated.
-A heading under a `---` the filter passed over is not collected either, since that rule started no chain.
-A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
+The [Reference](reference.qmd#options) states the collection rule.
+The short of it is that a heading joins the chain only where it follows the slide heading, another heading, or an absorbed `---` directly.
 
 ```markdown
 ## Results
@@ -378,6 +376,7 @@ The filter leaves the rule in place, and RevealJS starts a new slide at it with 
 ## What the extension reports
 
 Each of these is written to the render log, and none of them stops the render.
+The extension writes the `[cascade]` tag and the message, and Quarto writes the `(W)` or `(E)` in front of it.
 
 A chain that skips a heading level usually points at an accidental gap in the source:
 
