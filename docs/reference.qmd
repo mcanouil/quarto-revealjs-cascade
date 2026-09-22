@@ -32,6 +32,22 @@ extensions:
 Only headings at or below the slide level are ever repeated.
 A `#` above the slide level starts its own section slide and is not carried onto a continuation, whatever `depth` says.
 
+A heading joins the chain when it comes directly after the slide-level heading, directly after another heading, or directly after a `---` the filter absorbed.
+A heading written after body text is not collected, and is not repeated.
+A heading under a `---` the filter passed over is not collected either, since that rule started no chain.
+A heading marked `.no-cascade` stays out of the chain, and does not stop the heading written under it from joining.
+
+The repeated slide-level heading is what starts the continuation slide.
+The filter takes a `---` out of the document only while the chain holds at least one heading.
+So a `---` whose chain holds headings, none of them at slide level, starts no slide, and the content under it stays on the slide above.
+A `---` whose chain is empty stays in the document instead, and RevealJS starts a slide with no heading on it.
+
+What the chain holds changes as the document goes.
+A heading above the slide level clears it.
+A slide-level heading restarts it from the headings above that level.
+A heading marked `.no-cascade` stays out of it.
+Each repeat then replaces the chain with the headings that repeat wrote, which can be none: `depth: 0` and `cascade-depth="0"` write none, and a `---` followed by a heading writes only the headings above that heading's level.
+
 A repeated heading is a copy with its identifier removed, so it carries no anchor of its own and the original heading keeps the only link to that section.
 
 ### Shifted heading levels
@@ -57,12 +73,16 @@ Leave the two out of step and the chain is read one level off: the heading that 
 | Written on a heading | Effect |
 | --- | --- |
 | `{cascade-depth="1"}` | Overrides `depth` for the chain starting at that heading. |
-| `{.no-cascade}` | The heading stays on its own slide and is never carried forward. |
+| `{.no-cascade}` | The heading keeps its place in the source, and is never carried forward. |
 
 : The attribute and the class. {.striped .hover tbl-colwidths="[30,70]"}
 
 An override applies to the chain that begins at the annotated heading.
 The document-level setting resumes at the next heading at or above slide level.
+
+A heading below the slide level marked `.no-cascade` keeps its own place in the slide, and the `---` under it still starts a slide from the rest of the chain.
+A slide-level heading marked `.no-cascade` leaves the chain without a heading at slide level, so a `---` under it starts no slide while the chain still holds a heading below that level.
+With nothing else in the chain the `---` survives instead, and starts a slide with no heading on it.
 
 ## Divs
 
@@ -101,14 +121,25 @@ Two kinds of div are left alone, because reopening them would break them:
 
 : Horizontal rules that are not breaks. {.striped .hover tbl-colwidths="[36,64]"}
 
-## Warnings
+## What is reported
 
-Four things are reported at render time, and none of them stops the render:
+The filter reports four things, and none of them stops the render:
 
 - a cloned chain that skips a heading level, a `##` followed by a `####` with no `###` between, which usually points at an accidental gap in the source;
 - a `depth` or a `cascade-depth` that is not a whole number of zero or more. The attribute falls back to the document setting, and the option to repeating the whole chain;
 - a `shift` that is not a whole number, which is ignored in favour of `0`;
 - a `shift` that moves the slide level outside the range 1 to 6, which would leave every chain empty and repeat nothing, and is ignored in favour of `0`.
+
+The extension also checks what the document wrote against its own schema, before the filter reads an option.
+A key the schema does not declare in `extensions.cascade` is reported as a warning, and ignored.
+A value there of a type the schema does not accept is reported as an error, and the render still completes.
+A `cascade-depth` the schema does not accept is reported as a warning, since the attribute only ever overrides the document setting and the filter falls back to it.
+
+One mistake can therefore produce two messages.
+A `depth`, a `shift`, or a `cascade-depth` the schema rejects is named by the schema check, and then by the filter, which says what it does instead.
+A `keep-hrule` the schema rejects is named by the schema check alone, since the filter reads every value other than `false` as `true` and has nothing to add.
+
+The [Examples](examples.qmd) page shows the source behind each of these messages, and what the render log says.
 
 ## Outside RevealJS
 

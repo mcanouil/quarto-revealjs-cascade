@@ -39,13 +39,13 @@ A heading at this level starts a new chain under the same section, so only the p
 
 Only `## Limiting the depth` was repeated; `cascade-depth` limited the chain.
 
-## Opting out {.no-cascade}
+## Opting out
 
-### A subsection
+### An aside {.no-cascade}
 
 ---
 
-Only `### A subsection` was repeated, because the heading above carries `.no-cascade`.
+Only `## Opting out` was repeated, because the aside carries `.no-cascade`.
 
 ## More
 

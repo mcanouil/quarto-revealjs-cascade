@@ -11,6 +11,7 @@
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#39)
 - docs: Correct the documented default of keep-hrule from true to false. (#42)
+- docs: Add worked examples for every cascade behaviour. Correct what the pages say about a slide-level heading marked `.no-cascade`. (#43)
 
 ### Refactoring
 
