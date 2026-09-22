@@ -139,6 +139,13 @@ extensions:
 
 The filter replaces each `---` with the headings it repeats, and the repeated slide-level heading is what starts the new slide.
 A depth of `0` repeats no heading, so the first `---` starts no slide and the text under it stays on the slide above.
+Both examples below are for a document that sets it:
+
+```yaml
+extensions:
+  cascade:
+    depth: 0
+```
 
 ```markdown
 ## Results
@@ -191,7 +198,8 @@ The aside keeps its own place in the slide and is never carried forward, so the 
 A slide-level heading marked `.no-cascade` leaves the chain with no heading at slide level.
 Nothing then starts a new slide, and the rest of the chain is repeated in place, on the slide above.
 That needs a rest of the chain to repeat.
-Mark a slide-level heading `.no-cascade` with no other heading under it and the chain is empty, so the `---` stays in the document and starts a slide with no heading on it.
+Mark a slide-level heading `.no-cascade` with no other heading under it, and in a deck with no `#` section heading above it, and the chain is empty, so the `---` stays in the document and starts a slide with no heading on it.
+Put a `#` section heading above it and the chain holds that heading instead, so the `---` is taken out and nothing starts a new slide.
 
 ```markdown
 ## Opting a heading out {.no-cascade}
@@ -328,6 +336,8 @@ Body of the second slide.
 The second slide carries `### Experiment A` alone.
 `## Results` is above the slide level, so it keeps its own section slide and is not repeated.
 `shift-heading-level-by: -1` moves `# Part one` to level 0, which Pandoc reads as the document title, so it names the deck instead of starting a slide.
+Only a `#` written at the top of the document does that.
+Write a second `#` later and the shift leaves it below level 1, where Pandoc writes it as a plain paragraph and it starts no slide at all.
 
 Leave `shift` out and the filter reads the slide level as 2.
 It then treats `## Results` as a slide heading and repeats it, so the `---` produces a duplicate section slide before the continuation.
@@ -396,7 +406,8 @@ Body of the second slide.
 (W) [cascade] Heading chain skips from level 2 ("Results") to level 4 ("Deep detail") on a continuation slide; intermediate level(s) are missing.
 ```
 
-A `depth` the extension cannot use is reported twice, once by the schema check and once by the filter:
+A `depth` the extension cannot use is reported twice, once by the schema check and once by the filter.
+The block below carries a second, unrelated mistake as well, a `dept` typo, which the schema check reports on its own:
 
 ```yaml
 extensions:
