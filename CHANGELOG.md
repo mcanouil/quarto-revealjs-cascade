@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.1 (2026-09-23)
+
 ### Bug Fixes
 
 - fix: Read the cascade depth attribute through the schema, so a rejected value is reported instead of silently changing which headings repeat. (#42)
