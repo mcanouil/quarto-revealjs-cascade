@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: Read the slide level from the `slide-level` metadata when the writer gives no number for it, so decks render with Quarto 2.
+
 ## 2.1.1 (2026-09-23)
 
 ### Bug Fixes
