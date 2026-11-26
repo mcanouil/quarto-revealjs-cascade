@@ -185,13 +185,14 @@ end
 --- A shift that puts the result outside the range of a heading level makes
 --- every chain empty, so no `---` would produce a slide break. That is
 --- always a mistake in the option, so it is reported and the shift ignored.
+--- Quarto 2 gives no number in `PANDOC_WRITER_OPTIONS.slide_level`, so the
+--- `slide-level` metadata is read next, and 2 is the last fallback.
 --- @param meta pandoc.Meta The document metadata.
 --- @return integer The slide level in AST coordinates.
 local function detect_slide_level(meta)
-  local slide_level = 2
-  if PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.slide_level then
-    slide_level = PANDOC_WRITER_OPTIONS.slide_level
-  end
+  local writer_level = PANDOC_WRITER_OPTIONS and tonumber(PANDOC_WRITER_OPTIONS.slide_level)
+  local meta_level = meta['slide-level'] and tonumber(pandoc.utils.stringify(meta['slide-level']))
+  local slide_level = writer_level or meta_level or 2
   local shift = get_shift(meta)
   local ast_slide_level = slide_level - shift
   if ast_slide_level < 1 or ast_slide_level > MAXIMUM_HEADING_LEVEL then
